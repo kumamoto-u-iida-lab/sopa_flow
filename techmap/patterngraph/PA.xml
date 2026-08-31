@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<file>
+    <cell>
+        <name>2PAE</name>
+        <input_list>
+            <input>I_a</input>
+            <input>I_b</input>
+        </input_list>
+        <output_list>
+            <output>O_a</output>
+        </output_list>
+    </cell>
+    <patterngraph inner_wire="0">
+        <name>PG0</name>
+        <configuration_memory>00</configuration_memory>
+        <input_list>
+            <input cell_input="I_a">1</input>
+            <input cell_input="I_b">1</input>
+        </input_list>
+        <output_list>
+            <output cell_output="O_a">1</output>
+        </output_list>
+        <node_list>
+            <node>
+                <id>1</id>
+                <type>AND</type>
+                <fanin_num>2</fanin_num>
+                <fanout_num>x</fanout_num>
+            </node>
+        </node_list>
+        <edge_list>
+        </edge_list>
+    </patterngraph>
+
+    <patterngraph inner_wire="0">
+        <name>PG1</name>
+        <configuration_memory>01</configuration_memory>
+        <input_list>
+            <input cell_input="I_a">1</input>
+            <input cell_input="I_b">2</input>
+        </input_list>
+        <output_list>
+            <output cell_output="O_a">1</output>
+        </output_list>
+        <node_list>
+            <node>
+                <id>1</id>
+                <type>AND</type>
+                <fanin_num>2</fanin_num>
+                <fanout_num>x</fanout_num>
+            </node>
+            <node>
+                <id>2</id>
+                <type>INV</type>
+                <fanin_num>1</fanin_num>
+                <fanout_num>1</fanout_num>
+            </node>
+        </node_list>
+        <edge_list>
+            <edge>
+                <start>2</start>
+                <stop>1</stop>
+            </edge>
+        </edge_list>
+    </patterngraph>
+
+    <patterngraph inner_wire="0">
+        <name>PG2</name>
+        <configuration_memory>10</configuration_memory>
+        <input_list>
+            <input cell_input="I_a">1</input>
+            <input cell_input="I_b">1</input>
+        </input_list>
+        <output_list>
+            <output cell_output="O_a">3</output>
+        </output_list>
+        <node_list>
+            <node>
+                <id>1</id>
+                <type>AND</type>
+                <fanin_num>2</fanin_num>
+                <fanout_num>1</fanout_num>
+            </node>
+            <node>
+                <id>3</id>
+                <type>INV</type>
+                <fanin_num>1</fanin_num>
+                <fanout_num>x</fanout_num>
+            </node>
+        </node_list>
+        <edge_list>
+            <edge>
+                <start>1</start>
+                <stop>3</stop>
+            </edge>
+        </edge_list>
+    </patterngraph>
+
+    <patterngraph inner_wire="0">
+        <name>PG3</name>
+        <configuration_memory>11</configuration_memory>
+        <input_list>
+            <input cell_input="I_a">1</input>
+            <input cell_input="I_b">2</input>
+        </input_list>
+        <output_list>
+            <output cell_output="O_a">3</output>
+        </output_list>
+        <node_list>
+            <node>
+                <id>1</id>
+                <type>AND</type>
+                <fanin_num>2</fanin_num>
+                <fanout_num>1</fanout_num>
+            </node>
+            <node>
+                <id>2</id>
+                <type>INV</type>
+                <fanin_num>1</fanin_num>
+                <fanout_num>1</fanout_num>
+            </node>
+            <node>
+                <id>3</id>
+                <type>INV</type>
+                <fanin_num>1</fanin_num>
+                <fanout_num>x</fanout_num>
+            </node>
+        </node_list>
+        <edge_list>
+            <edge>
+                <start>2</start>
+                <stop>1</stop>
+            </edge>
+            <edge>
+                <start>1</start>
+                <stop>3</stop>
+            </edge>
+        </edge_list>
+    </patterngraph>
+
+    <!--INV-->
+    <patterngraph inner_wire="0">
+        <name>PG4</name>
+        <configuration_memory>10</configuration_memory>
+        <input_list>
+            <input cell_input="I_a">3</input>
+            <input cell_input="I_b">T</input>
+        </input_list>
+        <output_list>
+            <output cell_output="O_a">3</output>
+        </output_list>
+        <node_list>
+            <node>
+                <id>3</id>
+                <type>INV</type>
+                <fanin_num>1</fanin_num>
+                <fanout_num>x</fanout_num>
+            </node>
+        </node_list>
+        <edge_list>
+        </edge_list>
+    </patterngraph>
+</file>

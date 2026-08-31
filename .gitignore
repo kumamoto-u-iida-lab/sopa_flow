@@ -1,0 +1,14 @@
+# 生成物
+results/
+__pycache__/
+*.pyc
+
+# ★秘密情報は絶対に追跡しない
+*.lic
+gurobi.lic
+
+# 配置配線の結果（実行するたびに出る）
+src/place_ft_cone_*.json
+src/place_skip_cone_*.json
+src/cone_ext_uniform/
+*.png

@@ -1,0 +1,13 @@
+library(yosys_cells) {
+	cell(DFF_PN0) {
+		ff(IQ, IQN) {
+			clocked_on: "C";
+			next_state: "D";
+			clear: "!R";
+		}
+		pin(D) { direction: input; }
+		pin(R) { direction: input; }
+		pin(C) { direction: input; clock: true; }
+		pin(Q) { direction: output; function: "IQ"; }
+	}
+}

@@ -239,8 +239,14 @@ print(f"  中継こみ占有: {[occk.get(k,0)+relk.get(k,0) for k in range(D)]} 
 byd = defaultdict(int)
 for (k, d), n in usedtrk.items(): byd[d] += n
 print(f"  skipトラック使用 = {sum(usedtrk.values())}本  距離別: {dict(sorted(byd.items()))} / 構造の持ち分 {sum(bud.values())}本")
-out = {'col': col, 'relay': [[o, k] for o, k in rel],
-       'row': {f'{o}@{k}': r for (o, k), r in row.items()},
+# ★2026-08-31: 下流(gen_config_verilog.py)は row を「セル名 -> 行」で読む。
+#   このツールは中継のぶん (セル,段) をキーにしているので、本体の行だけを取り出した
+#   旧 place_skip_cone.py 互換のキーも一緒に書く。中継が0個なら両者は完全に等価。
+#   row_body … 本体の行だけ（旧形式）  row … 中継こみ（このツール独自）
+row_body = {o: row[(o, k)] for o, k in col.items() if (o, k) in row}
+out = {'col': col, 'row': row_body,
+       'relay': [[o, k] for o, k in rel],
+       'row_all': {f'{o}@{k}': r for (o, k), r in row.items()},
        'trk': {f'{k},{d}': n for (k, d), n in usedtrk.items()}}
 fn = f'place_ft_cone_{CKT}.json'
 json.dump(out, open(fn, 'w'), ensure_ascii=False)

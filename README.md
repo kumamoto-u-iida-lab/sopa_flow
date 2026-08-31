@@ -3,7 +3,7 @@
 SoPA（提案する eFPGA 配線構造）に、FSMベンチマークを **RTL から配置配線まで通す**ための最小構成。
 
 ```
-元RTL (.v)  →①→  ネットリスト (eblif)  →②→  配線構造 (.v)  →③→  配置配線
+元RTL (.v) →①→ ネットリスト(eblif) →②→ 配線構造(.v) →③→ 配置配線 →④→ bitstream →⑤→ 検証
 ```
 
 ## 必要なもの
@@ -14,6 +14,7 @@ SoPA（提案する eFPGA 配線構造）に、FSMベンチマークを **RTL �
 | **ortools** | ③の配置配線 (CP-SAT) | `pip install ortools` |
 | **yosys** | ①の論理合成 | PATH に置くか `YOSYS=<パス>` |
 | **Gurobi + ライセンス** | ①のテクノロジマッピング(ILP) | `~/gurobi.lic` か `GRB_LICENSE_FILE` |
+| iverilog | ⑤' のシミュレーション（任意） | oss-cad-suite など。`SIMBIN=<bin>` |
 
 **②③に Gurobi は不要**です。eblif さえあれば ortools だけで動きます。
 
@@ -58,6 +59,26 @@ ATIME=600 FFLAST=1 python3 place_ft_cone.py \
 FROM_RTL=1 python3 gen_ext_uniform_all.py girl10
 ```
 
+```bash
+# ④ bitstream と、構成メモリを焼き込んだ Verilog(Impl)
+python3 gen_config_verilog.py \
+    ../results/eblif_from_rtl/girl10/mapped_girl10.v.eblif \
+    ../results/cone_ext_uniform/girl10.v \
+    place_ft_cone_girl10.json \
+    ../results/impl_girl10.v
+#   → results/impl_girl10.v  構成を焼き込んだVerilog
+#     results/girl10.bit      bitstream（0/1のASCII 1行・長さ=config幅）
+#     results/girl10_io.txt   I/O対応表
+
+# ⑤ 等価検証（yosys の SAT。元RTL と Impl が同じ動きをするか）
+./equiv_check.sh girl10 16
+#   → girl10: EQUIVALENT  (16段, 全入力組合せ網羅)
+
+# ⑤' シミュレーション（iverilog が要る。tbで元RTLと毎サイクル照合）
+python3 gen_tb_sopa.py ../results/impl_girl10.v      # tbを作る
+SIMBIN=<oss-cad-suite/bin> python3 run_all_sim.py girl10
+```
+
 ### girl10 で期待される出力
 
 ```
@@ -92,6 +113,10 @@ src/        ツール8本
   place_greedy.py         eblif を読む load()
   sopa_paths.py           場所の解決と環境点検
   superset_profile.py     全回路の包絡線を数える（スーパーセット構造の設計用）
+  gen_config_verilog.py   ④ 配置結果 → bitstream と構成済みVerilog
+  equiv_check.sh          ⑤ yosysのSATで元RTLとの等価性を証明（iverilog不要）
+  gen_tb_sopa.py          ⑤' Ref(元RTL)とImpl(SoPA)を並べて毎サイクル照合するtbを作る
+  run_all_sim.py          ⑤' iverilog で実際にシミュレーションする
 techmap/    テクノロジマッピング（main.py / ilp_gurobi.py / make_eblif.py / PA.xml）
 pylib/      blif の前処理（BitstreamGen.PreProcess.*）
 lib/        mycells.lib（DFF_PN0 の定義元。全FFが同型になる理由）
@@ -115,3 +140,6 @@ results/    生成物（gitには入れない）
 - ③の結果 `UNKNOWN` は「載らない」ではなく**時間切れ**です。`ATIME` を伸ばしてください
   （`OPTIMAL`＝載る、`INFEASIBLE`＝載らないことの証明、が確定解）
 - ③はメモリを食います。並列で回すなら **同時本数 ≒ 空きメモリ(GB) ÷ 2** が目安です
+- ⑤の SAT は**有限段（既定16段）の証明**です。またクロック極性の誤りは検出できません
+  （`sat -seq` はFFを1段進めるモデルでクロック信号を見ないため）。そこは ⑤' の
+  シミュレーションが捕まえます。2026-08-06 に実測で確認済み

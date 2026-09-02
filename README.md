@@ -193,3 +193,13 @@ STEP=4 JOBS=4 ATIME=7200 ./run_noskip_superset.sh e4 e2   # ④だけ・回路�
 
 ⚠️ ④はメモリを食う。7.6GB のマシンでは CP-SAT が OOM killer に殺された（1本あたり最大 1.7GB 超）。
 `JOBS` は 空きメモリ(GB)÷2 を目安に。
+
+### 配置ツールの選択（2026-09-02 追記）
+`src/place_fixed_tbl.py` は `place_fixed_skip_ext.py` と**同じ問題**を、辺1本＝表制約
+（`AddAllowedAssignments`）1個で符号化した版。変数の数が 1/幅 程度に減る。
+```
+ass13 を skip無し超集合へ:  旧符号化 3,068秒(iidalab) → 表制約 112秒(ローカル)
+bridge（占有率1.00の段あり）: どちらも 3,600秒/900秒で UNKNOWN
+```
+UNKNOWN が出た回路の再実行は `STEP=4 TOOL=place_fixed_tbl.py JOBS=8 ATIME=7200 ./run_noskip_superset.sh dmac bridge ...`。
+`src/place_sa_fixed.py`（IPGen の SA を移植した版）は girl10 以外で収束しなかった（記録用に残す）。

@@ -15,3 +15,5 @@ src/cone_ext_uniform/
 
 # 段固定配置の結果json
 src/place_fixed_skip_ext_*.json
+src/place_fixed_tbl_*.json
+src/place_sa_fixed_*.json

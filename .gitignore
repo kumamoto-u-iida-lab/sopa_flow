@@ -12,3 +12,6 @@ src/place_ft_cone_*.json
 src/place_skip_cone_*.json
 src/cone_ext_uniform/
 *.png
+
+# 段固定配置の結果json
+src/place_fixed_skip_ext_*.json

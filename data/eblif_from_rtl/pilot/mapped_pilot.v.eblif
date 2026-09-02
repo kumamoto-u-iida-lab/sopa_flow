@@ -1,0 +1,390 @@
+.model pilot
+.inputs clk rst x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15 x16 x17 x18 x19 x20 x21 x22 x24 x25 x26 x27
+.outputs pr_state[0] pr_state[1] pr_state[2] pr_state[3] pr_state[4]
+.names $false
+.names $true
+1
+.names $undef
+.subckt cell I_a=$abc$4723$new_n55_ I_b=$abc$4723$new_n56_ O_a=$abc$4723$new_n74_
+.param MODE 00
+.subckt cell I_a=pr_state[4] I_b=$abc$4723$new_n74_ O_a=$abc$4723$new_n75_
+.param MODE 00
+.subckt cell I_a=$auto$dfflibmap.cc:519:dfflibmap$4703 I_b=pr_state[1] O_a=$abc$4723$new_n76_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n75_ I_b=$abc$4723$new_n76_ O_a=$abc$4723$new_n77_
+.param MODE 00
+.subckt cell I_a=pr_state[3] I_b=pr_state[2] O_a=$abc$4723$new_n79_
+.param MODE 00
+.subckt cell I_a=pr_state[0] I_b=$abc$4723$new_n53_ O_a=$abc$4723$new_n80_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n53_ I_b=pr_state[1] O_a=$abc$4723$new_n81_
+.param MODE 00
+.subckt cell I_a=pr_state[1] I_b=$abc$4723$new_n80_ O_a=$abc$4723$new_n82_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n79_ I_b=$abc$4723$new_n82_ O_a=$abc$4723$new_n83_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n59_ I_b=$abc$4723$new_n78_ O_a=$abc$4723$new_n87_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n67_ I_b=x1 O_a=$abc$4723$new_n97_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n69_ I_b=$abc$4723$new_n97_ O_a=$abc$4723$new_n98_
+.param MODE 00
+.subckt cell I_a=x26 I_b=$abc$4723$new_n98_ O_a=$abc$4723$new_n99_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n54_ I_b=$abc$4723$new_n80_ O_a=$abc$4723$new_n103_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n74_ I_b=$abc$4723$new_n103_ O_a=$abc$4723$new_n104_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n68_ I_b=x27 O_a=$abc$4723$new_n107_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n97_ I_b=$abc$4723$new_n107_ O_a=$abc$4723$new_n108_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n106_ I_b=$abc$4723$new_n113_ O_a=$abc$4723$new_n114_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n104_ I_b=$abc$4723$new_n114_ O_a=$abc$4723$new_n115_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n102_ I_b=$abc$4723$new_n115_ O_a=$abc$4723$new_n116_
+.param MODE 00
+.subckt cell I_a=$auto$dfflibmap.cc:519:dfflibmap$4703 I_b=$abc$4723$new_n54_ O_a=$abc$4723$new_n119_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n53_ I_b=$abc$4723$new_n119_ O_a=$abc$4723$new_n120_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n79_ I_b=$abc$4723$new_n120_ O_a=$abc$4723$new_n122_
+.param MODE 00
+.subckt cell I_a=x24 I_b=x2 O_a=$abc$4723$new_n123_
+.param MODE 00
+.subckt cell I_a=x3 I_b=$abc$4723$new_n123_ O_a=$abc$4723$new_n124_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n124_ I_b=$abc$4723$new_n127_ O_a=$abc$4723$new_n129_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n122_ I_b=$abc$4723$new_n129_ O_a=$abc$4723$new_n131_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n54_ I_b=$abc$4723$new_n75_ O_a=$abc$4723$new_n133_
+.param MODE 00
+.subckt cell I_a=pr_state[0] I_b=$abc$4723$new_n133_ O_a=$abc$4723$new_n134_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n53_ I_b=$abc$4723$new_n76_ O_a=$abc$4723$new_n136_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n79_ I_b=$abc$4723$new_n136_ O_a=$abc$4723$new_n138_
+.param MODE 00
+.subckt cell I_a=pr_state[3] I_b=$abc$4723$new_n56_ O_a=$abc$4723$new_n143_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n136_ I_b=$abc$4723$new_n143_ O_a=$abc$4723$new_n145_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n55_ I_b=pr_state[2] O_a=$abc$4723$new_n148_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n136_ I_b=$abc$4723$new_n148_ O_a=$abc$4723$new_n149_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n95_ I_b=$abc$4723$new_n149_ O_a=$abc$4723$new_n150_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n80_ I_b=$abc$4723$new_n148_ O_a=$abc$4723$new_n157_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n154_ I_b=$abc$4723$new_n159_ O_a=$abc$4723$new_n160_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n82_ I_b=$abc$4723$new_n143_ O_a=$abc$4723$new_n161_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n57_ I_b=$abc$4723$new_n119_ O_a=$abc$4723$new_n163_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n160_ I_b=$abc$4723$new_n166_ O_a=$abc$4723$new_n167_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n152_ I_b=$abc$4723$new_n167_ O_a=$abc$4723$new_n168_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n142_ I_b=$abc$4723$new_n168_ O_a=$abc$4723$new_n169_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n118_ I_b=$abc$4723$new_n169_ O_a=$abc$4723$auto$rtlil.cc:2020:NotGate$4702
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n172_ I_b=$abc$4723$new_n174_ O_a=$abc$4723$new_n175_
+.param MODE 00
+.subckt cell I_a=pr_state[1] I_b=$abc$4723$new_n157_ O_a=$abc$4723$new_n176_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n179_ I_b=$abc$4723$new_n181_ O_a=$abc$4723$new_n182_
+.param MODE 00
+.subckt cell I_a=x25 I_b=x7 O_a=$abc$4723$new_n185_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n175_ I_b=$abc$4723$new_n189_ O_a=$abc$4723$new_n190_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n127_ I_b=$abc$4723$new_n191_ O_a=$abc$4723$new_n193_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n83_ I_b=$abc$4723$new_n196_ O_a=$abc$4723$new_n197_
+.param MODE 00
+.subckt cell I_a=x7 I_b=$abc$4723$new_n74_ O_a=$abc$4723$new_n199_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n74_ I_b=$abc$4723$new_n136_ O_a=$abc$4723$new_n202_
+.param MODE 00
+.subckt cell I_a=x12 I_b=$abc$4723$new_n108_ O_a=$abc$4723$new_n205_
+.param MODE 00
+.subckt cell I_a=x1 I_b=x26 O_a=$abc$4723$new_n210_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n209_ I_b=$abc$4723$new_n210_ O_a=$abc$4723$new_n211_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n104_ I_b=$abc$4723$new_n215_ O_a=$abc$4723$new_n216_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n59_ I_b=x25 O_a=$abc$4723$new_n218_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n148_ I_b=$abc$4723$new_n223_ O_a=$abc$4723$new_n224_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n103_ I_b=$abc$4723$new_n143_ O_a=$abc$4723$new_n228_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n67_ I_b=x13 O_a=$abc$4723$new_n229_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n227_ I_b=$abc$4723$new_n232_ O_a=$abc$4723$new_n233_
+.param MODE 00
+.subckt cell I_a=x10 I_b=$abc$4723$new_n77_ O_a=$abc$4723$new_n241_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n234_ I_b=$abc$4723$new_n244_ O_a=$abc$4723$new_n245_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n190_ I_b=$abc$4723$new_n247_ O_a=$abc$4723$new_n248_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n165_ I_b=$abc$4723$new_n201_ O_a=$abc$4723$new_n259_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n104_ I_b=$abc$4723$new_n263_ O_a=$abc$4723$new_n264_
+.param MODE 00
+.subckt cell I_a=x19 I_b=x17 O_a=$abc$4723$new_n266_
+.param MODE 00
+.subckt cell I_a=x18 I_b=$abc$4723$new_n266_ O_a=$abc$4723$new_n267_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n120_ I_b=$abc$4723$new_n143_ O_a=$abc$4723$new_n273_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n147_ I_b=$abc$4723$new_n279_ O_a=$abc$4723$new_n280_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n277_ I_b=$abc$4723$new_n280_ O_a=$abc$4723$new_n281_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n261_ I_b=$abc$4723$new_n281_ O_a=$abc$4723$new_n282_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n189_ I_b=$abc$4723$new_n259_ O_a=$abc$4723$new_n283_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n258_ I_b=$abc$4723$new_n283_ O_a=$abc$4723$new_n284_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n113_ I_b=$abc$4723$new_n289_ O_a=$abc$4723$new_n290_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n234_ I_b=$abc$4723$new_n293_ O_a=$abc$4723$new_n296_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n279_ I_b=$abc$4723$new_n297_ O_a=$abc$4723$new_n298_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n175_ I_b=$abc$4723$new_n299_ O_a=$abc$4723$new_n300_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n298_ I_b=$abc$4723$new_n300_ O_a=$abc$4723$new_n301_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n261_ I_b=$abc$4723$new_n301_ O_a=$abc$4723$new_n302_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n308_ I_b=$abc$4723$new_n310_ O_a=$abc$4723$new_n311_
+.param MODE 00
+.subckt cell I_a=$abc$4723$new_n86_ I_b=$abc$4723$new_n87_ O_a=$abc$4723$new_n89_
+.param MODE 01
+.subckt cell I_a=x2 I_b=x5 O_a=$abc$4723$new_n94_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n94_ I_b=x4 O_a=$abc$4723$new_n95_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n72_ I_b=x14 O_a=$abc$4723$new_n109_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n109_ I_b=x16 O_a=$abc$4723$new_n110_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n93_ I_b=$abc$4723$new_n116_ O_a=$abc$4723$new_n118_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n62_ I_b=x22 O_a=$abc$4723$new_n126_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n126_ I_b=x21 O_a=$abc$4723$new_n127_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n140_ I_b=$abc$4723$new_n134_ O_a=$abc$4723$new_n141_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n141_ I_b=$abc$4723$new_n131_ O_a=$abc$4723$new_n142_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n147_ I_b=$abc$4723$new_n150_ O_a=$abc$4723$new_n152_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n156_ I_b=$abc$4723$new_n157_ O_a=$abc$4723$new_n159_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n165_ I_b=$abc$4723$new_n161_ O_a=$abc$4723$new_n166_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n68_ I_b=x12 O_a=$abc$4723$new_n177_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n176_ I_b=$abc$4723$new_n185_ O_a=$abc$4723$new_n187_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n122_ I_b=$abc$4723$new_n129_ O_a=$abc$4723$new_n191_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n201_ I_b=$abc$4723$new_n202_ O_a=$abc$4723$new_n204_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n106_ I_b=$abc$4723$new_n211_ O_a=$abc$4723$new_n213_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n233_ I_b=$abc$4723$new_n224_ O_a=$abc$4723$new_n234_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n149_ I_b=x2 O_a=$abc$4723$new_n235_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n230_ I_b=$abc$4723$new_n218_ O_a=$abc$4723$new_n237_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n240_ I_b=$abc$4723$new_n241_ O_a=$abc$4723$new_n243_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n243_ I_b=$abc$4723$new_n197_ O_a=$abc$4723$new_n244_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n204_ I_b=$abc$4723$new_n235_ O_a=$abc$4723$new_n246_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n246_ I_b=$abc$4723$new_n193_ O_a=$abc$4723$new_n247_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n248_ I_b=$abc$4723$new_n216_ O_a=$abc$4723$new_n249_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n255_ I_b=$abc$4723$new_n143_ O_a=$abc$4723$new_n256_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n253_ I_b=$abc$4723$new_n256_ O_a=$abc$4723$new_n258_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n268_ I_b=$abc$4723$new_n127_ O_a=$abc$4723$new_n269_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n122_ I_b=$abc$4723$new_n269_ O_a=$abc$4723$new_n271_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n276_ I_b=$abc$4723$new_n271_ O_a=$abc$4723$new_n277_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n284_ I_b=$abc$4723$new_n264_ O_a=$abc$4723$new_n285_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n295_ I_b=$abc$4723$new_n191_ O_a=$abc$4723$new_n297_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n240_ I_b=$abc$4723$new_n273_ O_a=$abc$4723$new_n299_
+.param MODE 01
+.subckt cell I_a=$abc$4723$new_n58_ I_b=x8 O_a=$abc$4723$new_n91_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n89_ I_b=$abc$4723$new_n91_ O_a=$abc$4723$new_n93_
+.param MODE 10
+.subckt cell I_a=x25 I_b=x1 O_a=$abc$4723$new_n106_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n108_ I_b=$abc$4723$new_n110_ O_a=$abc$4723$new_n113_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n124_ I_b=$abc$4723$new_n138_ O_a=$abc$4723$new_n140_
+.param MODE 10
+.subckt cell I_a=x6 I_b=$abc$4723$new_n145_ O_a=$abc$4723$new_n147_
+.param MODE 10
+.subckt cell I_a=pr_state[3] I_b=$abc$4723$new_n103_ O_a=$abc$4723$new_n154_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n74_ I_b=$abc$4723$new_n81_ O_a=$abc$4723$new_n156_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n75_ I_b=$abc$4723$new_n163_ O_a=$abc$4723$new_n165_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n79_ I_b=$abc$4723$new_n103_ O_a=$abc$4723$new_n174_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n68_ I_b=x12 O_a=$abc$4723$new_n179_
+.param MODE 10
+.subckt cell I_a=x26 I_b=x7 O_a=$abc$4723$new_n181_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n67_ I_b=$abc$4723$new_n182_ O_a=$abc$4723$new_n184_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n184_ I_b=$abc$4723$new_n187_ O_a=$abc$4723$new_n189_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n58_ I_b=x9 O_a=$abc$4723$new_n196_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n82_ I_b=$abc$4723$new_n199_ O_a=$abc$4723$new_n201_
+.param MODE 10
+.subckt cell I_a=x2 I_b=$abc$4723$new_n69_ O_a=$abc$4723$new_n209_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n207_ I_b=$abc$4723$new_n213_ O_a=$abc$4723$new_n215_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n103_ I_b=$abc$4723$new_n218_ O_a=$abc$4723$new_n221_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n228_ I_b=$abc$4723$new_n229_ O_a=$abc$4723$new_n232_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n245_ I_b=$abc$4723$new_n249_ O_a=$abc$4723$nx_state[1]
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n57_ I_b=$abc$4723$new_n134_ O_a=$abc$4723$new_n253_
+.param MODE 10
+.subckt cell I_a=x10 I_b=$abc$4723$new_n89_ O_a=$abc$4723$new_n261_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n267_ I_b=$abc$4723$new_n273_ O_a=$abc$4723$new_n276_
+.param MODE 10
+.subckt cell I_a=x25 I_b=$abc$4723$new_n228_ O_a=$abc$4723$new_n279_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n282_ I_b=$abc$4723$new_n285_ O_a=$abc$4723$nx_state[2]
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n98_ I_b=$abc$4723$new_n177_ O_a=$abc$4723$new_n289_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n176_ I_b=$abc$4723$new_n185_ O_a=$abc$4723$new_n295_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n296_ I_b=$abc$4723$new_n302_ O_a=$abc$4723$nx_state[3]
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n58_ I_b=$abc$4723$new_n86_ O_a=$abc$4723$new_n306_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n59_ I_b=$abc$4723$new_n83_ O_a=$abc$4723$new_n308_
+.param MODE 10
+.subckt cell I_a=x11 I_b=$abc$4723$new_n133_ O_a=$abc$4723$new_n310_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n306_ I_b=$abc$4723$new_n311_ O_a=$abc$4723$nx_state[4]
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n78_ I_b=$abc$4723$new_n83_ O_a=$abc$4723$new_n86_
+.param MODE 11
+.subckt cell I_a=$abc$4723$new_n99_ I_b=$abc$4723$new_n95_ O_a=$abc$4723$new_n102_
+.param MODE 11
+.subckt cell I_a=$abc$4723$new_n138_ I_b=$abc$4723$new_n124_ O_a=$abc$4723$new_n172_
+.param MODE 11
+.subckt cell I_a=$abc$4723$new_n205_ I_b=$abc$4723$new_n110_ O_a=$abc$4723$new_n207_
+.param MODE 11
+.subckt cell I_a=$abc$4723$new_n221_ I_b=$abc$4723$new_n120_ O_a=$abc$4723$new_n223_
+.param MODE 11
+.subckt cell I_a=$abc$4723$new_n145_ I_b=x6 O_a=$abc$4723$new_n227_
+.param MODE 11
+.subckt cell I_a=$abc$4723$new_n161_ I_b=$abc$4723$new_n237_ O_a=$abc$4723$new_n240_
+.param MODE 11
+.subckt cell I_a=$abc$4723$new_n154_ I_b=$abc$4723$new_n136_ O_a=$abc$4723$new_n255_
+.param MODE 11
+.subckt cell I_a=$abc$4723$new_n207_ I_b=$abc$4723$new_n99_ O_a=$abc$4723$new_n263_
+.param MODE 11
+.subckt cell I_a=$abc$4723$new_n104_ I_b=$abc$4723$new_n290_ O_a=$abc$4723$new_n293_
+.param MODE 11
+.subckt cell I_a=rst I_b=$true O_a=$abc$4723$auto$rtlil.cc:2020:NotGate$4722
+.param MODE 10
+.subckt cell I_a=clk I_b=$true O_a=$abc$4723$auto$rtlil.cc:2020:NotGate$4720
+.param MODE 10
+.subckt cell I_a=$auto$dfflibmap.cc:519:dfflibmap$4703 I_b=$true O_a=pr_state[0]
+.param MODE 10
+.subckt cell I_a=pr_state[4] I_b=$true O_a=$abc$4723$new_n53_
+.param MODE 10
+.subckt cell I_a=pr_state[1] I_b=$true O_a=$abc$4723$new_n54_
+.param MODE 10
+.subckt cell I_a=pr_state[3] I_b=$true O_a=$abc$4723$new_n55_
+.param MODE 10
+.subckt cell I_a=pr_state[2] I_b=$true O_a=$abc$4723$new_n56_
+.param MODE 10
+.subckt cell I_a=x11 I_b=$true O_a=$abc$4723$new_n57_
+.param MODE 10
+.subckt cell I_a=x10 I_b=$true O_a=$abc$4723$new_n58_
+.param MODE 10
+.subckt cell I_a=x9 I_b=$true O_a=$abc$4723$new_n59_
+.param MODE 10
+.subckt cell I_a=x20 I_b=$true O_a=$abc$4723$new_n62_
+.param MODE 10
+.subckt cell I_a=x25 I_b=$true O_a=$abc$4723$new_n67_
+.param MODE 10
+.subckt cell I_a=x26 I_b=$true O_a=$abc$4723$new_n68_
+.param MODE 10
+.subckt cell I_a=x27 I_b=$true O_a=$abc$4723$new_n69_
+.param MODE 10
+.subckt cell I_a=x15 I_b=$true O_a=$abc$4723$new_n72_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n77_ I_b=$true O_a=$abc$4723$new_n78_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n229_ I_b=$true O_a=$abc$4723$new_n230_
+.param MODE 10
+.subckt cell I_a=$abc$4723$new_n267_ I_b=$true O_a=$abc$4723$new_n268_
+.param MODE 10
+.subckt cell I_a=clk I_b=$true O_a=$abc$4723$auto$rtlil.cc:2020:NotGate$4716
+.param MODE 10
+.subckt cell I_a=clk I_b=$true O_a=$abc$4723$auto$rtlil.cc:2020:NotGate$4712
+.param MODE 10
+.subckt cell I_a=clk I_b=$true O_a=$abc$4723$auto$rtlil.cc:2020:NotGate$4708
+.param MODE 10
+.subckt cell I_a=clk I_b=$true O_a=$abc$4723$auto$rtlil.cc:2020:NotGate$4700
+.param MODE 10
+.subckt cell I_a=rst I_b=$true O_a=$abc$4723$auto$rtlil.cc:2020:NotGate$4706
+.param MODE 10
+.subckt cell I_a=rst I_b=$true O_a=$abc$4723$auto$rtlil.cc:2020:NotGate$4710
+.param MODE 10
+.subckt cell I_a=rst I_b=$true O_a=$abc$4723$auto$rtlil.cc:2020:NotGate$4714
+.param MODE 10
+.subckt cell I_a=rst I_b=$true O_a=$abc$4723$auto$rtlil.cc:2020:NotGate$4718
+.param MODE 10
+.subckt DFF_PN0 C=$abc$4723$auto$rtlil.cc:2020:NotGate$4700 D=$abc$4723$auto$rtlil.cc:2020:NotGate$4702 Q=$auto$dfflibmap.cc:519:dfflibmap$4703 R=$abc$4723$auto$rtlil.cc:2020:NotGate$4706
+.subckt DFF_PN0 C=$abc$4723$auto$rtlil.cc:2020:NotGate$4708 D=$abc$4723$nx_state[1] Q=pr_state[1] R=$abc$4723$auto$rtlil.cc:2020:NotGate$4710
+.subckt DFF_PN0 C=$abc$4723$auto$rtlil.cc:2020:NotGate$4712 D=$abc$4723$nx_state[2] Q=pr_state[2] R=$abc$4723$auto$rtlil.cc:2020:NotGate$4714
+.subckt DFF_PN0 C=$abc$4723$auto$rtlil.cc:2020:NotGate$4716 D=$abc$4723$nx_state[3] Q=pr_state[3] R=$abc$4723$auto$rtlil.cc:2020:NotGate$4718
+.subckt DFF_PN0 C=$abc$4723$auto$rtlil.cc:2020:NotGate$4720 D=$abc$4723$nx_state[4] Q=pr_state[4] R=$abc$4723$auto$rtlil.cc:2020:NotGate$4722
+.conn $abc$4723$auto$rtlil.cc:2020:NotGate$4702 DummyBuf0
+.conn $abc$4723$nx_state[1] DummyBuf1
+.conn $abc$4723$nx_state[2] DummyBuf2
+.conn $abc$4723$nx_state[3] DummyBuf3
+.conn $abc$4723$nx_state[4] DummyBuf4
+.end
+
+

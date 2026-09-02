@@ -29,7 +29,7 @@
 """
 import os, re, sys, math, json
 
-SRC = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cone_ext_uniform")
+SRC = os.environ.get("SRC") or os.path.join(os.path.dirname(os.path.abspath(__file__)), "cone_ext_uniform")   # 2026-09-02: 環境変数SRCで差し替え可
 EXCLUDE = {"ass13_no_decoder", "proc16816_ff1", "proc16816_ff3"}
 
 RE_HEAD = re.compile(

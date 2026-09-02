@@ -163,3 +163,33 @@ results/    生成物（gitには入れない）
 ```bash
 python3 -c "import json;print(json.load(open('place_ft_cone_<回路>.json'))['relay'])"
 ```
+
+## skip無しスーパーセット実験（2026-09-02 追加）
+
+**問い**: skip配線を一切持たない構造（PA＋隣接配線＋外部入力だけ）に41回路すべてが載るか。
+段飛び辺はすべて**中継**（素通しに設定したPA。`I_B=1, MODE=00` で `O=A`、追加の構成メモリ0bit）で運ぶ。
+
+段固定（段 = D−1−R、R = FFまでの最長距離）では、段飛び辺「s(段c)→u(段c+g)」に要る中継の
+段と個数は SAT を回さなくても決まる（段 c+1..c+g−1 に1個ずつ。同じ信号の読み手が複数なら
+鎖は1本で、最遠の読み手までの g−1 個）。だから**ネットリストにセルを足すだけ**で、
+行だけ解く段固定ツール `place_fixed_skip_ext.py` がそのまま使える。
+
+```bash
+JOBS=4 ATIME=3600 ./run_noskip_superset.sh          # ①〜④ 全部（④だけがSAT）
+STEP=4 JOBS=4 ATIME=7200 ./run_noskip_superset.sh e4 e2   # ④だけ・回路を絞って再実行
+```
+| 手順 | ツール | 出力 |
+|---|---|---|
+| ① 中継挿入 | `src/insert_relay.py` | `results/eblif_relay/<回路>/mapped_<回路>.v.eblif` |
+| ② 回路ごとの skip無し構造（幅を数えるだけ） | `gen_ext_uniform_all.py`（`SKIP_SPECS=2:0`） | `results/cone_noskip/` |
+| ③ 包絡線 → スーパーセット | `superset_profile.py` → `src/gen_superset.py` | `results/superset_noskip.v` |
+| ④ 41回路を段固定で配置 | `src/place_fixed_skip_ext.py` | `results/noskip_place/<回路>.log`, `summary.csv` |
+
+`data/eblif_from_rtl/` に41回路の eblif（元RTL由来、2026-08-06 版）を同梱した。
+①は Gurobi が要るので、ライセンスの無いマシンでもここから始められるようにするため。
+
+ローカル(2026-09-02)で①〜③まで確認済み: D=18 / 総PA 792 / 最大幅 131 / CONFIG 11,083bit
+（skip有りスーパーセットは総PA 486 / CONFIG 10,350bit）。④は未実施（iidalab で回す）。
+
+⚠️ ④はメモリを食う。7.6GB のマシンでは CP-SAT が OOM killer に殺された（1本あたり最大 1.7GB 超）。
+`JOBS` は 空きメモリ(GB)÷2 を目安に。

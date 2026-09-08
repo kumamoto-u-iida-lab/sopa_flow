@@ -17,3 +17,13 @@ src/cone_ext_uniform/
 src/place_fixed_skip_ext_*.json
 src/place_fixed_tbl_*.json
 src/place_sa_fixed_*.json
+
+# 面積測定の生成物
+area/rtl/sopa_conf/*.v
+area/result_*/
+area/logs/
+area/run/
+area/alib/
+area/*.db
+area/*.sldb
+area/run_conf.log

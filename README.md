@@ -203,3 +203,17 @@ bridge（占有率1.00の段あり）: どちらも 3,600秒/900秒で UNKNOWN
 ```
 UNKNOWN が出た回路の再実行は `STEP=4 TOOL=place_fixed_tbl.py JOBS=8 ATIME=7200 ./run_noskip_superset.sh dmac bridge ...`。
 `src/place_sa_fixed.py`（IPGen の SA を移植した版）は girl10 以外で収束しなかった（記録用に残す）。
+
+### skip とフィードスルーの混在（2026-09-08 追加）
+`D0` = この距離未満の段飛びは中継、以上は構造側の skip で受ける。
+```
+D0=3  ケース(1) gap2 まで中継、gap3 以上は skip   → results/superset_d0_3.v（10,580 bit）
+D0=4  ケース(2) gap3 まで中継、gap4 以上は skip   → results/superset_d0_4.v（11,353 bit）
+D0=99 全部中継（既定、9/2 と同じ）               → results/superset_noskip.v（11,083 bit）
+```
+```bash
+D0=3 JOBS=8 ATIME=3600 TOOL=place_fixed_tbl.py ./run_noskip_superset.sh     # ①〜④
+D0=4 JOBS=8 ATIME=3600 TOOL=place_fixed_tbl.py ./run_noskip_superset.sh
+```
+出力は results/eblif_relay_d0_<D0>/ cone_d0_<D0>/ superset_d0_<D0>.v place_d0_<D0>/summary.csv。
+中継の規則: 信号ごとに鎖1本、鎖は「D0 未満の読み手のうち最遠」まで。D0 以上の読み手は skip トラックで受ける。

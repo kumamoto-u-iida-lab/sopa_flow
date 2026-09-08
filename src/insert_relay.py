@@ -31,6 +31,9 @@ from place_greedy import load
 ROOT = os.path.dirname(SD)
 EBDIR = os.environ.get("EBDIR", os.path.join(ROOT, "data", "eblif_from_rtl"))   # sopa_flow: 同梱の41回路eblif
 OUTDIR = os.environ.get("OUTDIR", os.path.join(ROOT, "results", "eblif_relay"))
+# ★2026-09-09: D0 = 「この距離未満の段飛びだけ中継にする」。gap >= D0 の辺はそのまま残す（構造側の skip で受ける）。
+#   既定 99 = 全部中継（9/2 と同じ）。ケース(1) gap2まで中継 = D0=3、ケース(2) gap3まで中継 = D0=4
+D0 = int(os.environ.get("D0", "99"))
 SKIP_CKT = {"ass13_no_decoder", "ass13_tb"}
 
 
@@ -75,7 +78,7 @@ def process(ckt, eb, out):
     for c in logic:
         u = c['o']
         for s in c['srcs']:
-            if s in cbo and col[u] - col[s] >= 2:
+            if s in cbo and 2 <= col[u] - col[s] < D0:
                 nskip += 1
                 maxgap[s] = max(maxgap[s], col[u] - col[s])
     # 書き換え: 入力の付け替え表 (u, s) -> s__r{g-1}
@@ -85,7 +88,7 @@ def process(ckt, eb, out):
         for s in c['srcs']:
             if s in cbo:
                 g = col[u] - col[s]
-                if g >= 2:
+                if 2 <= g < D0:
                     rewrite[(u, s)] = relay_name(s, g - 1)
     relays = []   # (name, src, col)
     for s, g in maxgap.items():
@@ -119,12 +122,12 @@ def process(ckt, eb, out):
     col2 = {o: (D2 - 1) - R2[o] for o in cb2}
     for o in comb_po_cells(out, cb2):
         col2[o] = D2 - 1
-    bad = [(u, s) for c in lg2 for u in [c['o']] for s in c['srcs'] if s in cb2 and col2[u] - col2[s] >= 2]   # 後ろ向き辺(移動した組合せPO→前段)はFFfbが吸収するので対象外
+    bad = [(u, s) for c in lg2 for u in [c['o']] for s in c['srcs'] if s in cb2 and 2 <= col2[u] - col2[s] < D0]   # 後ろ向き辺(移動した組合せPO→前段)はFFfbが吸収するので対象外
     moved = [o for o in cbo if col2.get(o) != col[o]]
     rc = Counter(cc for _, _, cc in relays)
     w_old = Counter(col.values()); w_new = Counter(col2.values())
-    print(f"{ckt:10s} D={D} セル{len(cbo)}→{len(cb2)} 中継{len(relays)}個 (段飛び辺{nskip}本, 鎖{len(maxgap)}本)"
-          f"  検算: 段飛び残り{len(bad)} / 元セルの段ずれ{len(moved)} / D {D}→{D2}", flush=True)
+    print(f"{ckt:10s} D={D} D0={D0} セル{len(cbo)}→{len(cb2)} 中継{len(relays)}個 (中継化した段飛び辺{nskip}本, 鎖{len(maxgap)}本)"
+          f"  検算: 中継化漏れ{len(bad)} / 元セルの段ずれ{len(moved)} / D {D}→{D2}", flush=True)
     print(f"           幅(旧) {[w_old.get(c,0) for c in range(D)]}")
     print(f"           中継   {[rc.get(c,0) for c in range(D)]}")
     print(f"           幅(新) {[w_new.get(c,0) for c in range(D2)]}")

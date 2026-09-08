@@ -15,6 +15,8 @@
 #            STEP=4 JOBS=4 ATIME=3600 ./run_noskip_superset.sh e4 e2  # ④だけ・回路を絞る
 #   環境変数: JOBS(並列本数, 既定2) / ATIME(1回路のSAT上限秒, 既定1800) / STEP(この番号の手順だけ)
 #             TOOL(④の配置ツール, 既定 place_fixed_skip_ext.py。place_fixed_tbl.py=表制約版、難物に速い)
+#             D0(この距離未満だけ中継、以上は skip。既定 99=全部中継。ケース(1) gap2まで中継=3、ケース(2) gap3まで中継=4)
+#             D0 を付けると出力は results/eblif_relay_d0_<D0>/ cone_d0_<D0>/ superset_d0_<D0>.v place_d0_<D0>/ に分かれる
 #   出力:   results/eblif_relay/ results/cone_noskip/ results/superset_profile.json results/superset_noskip.v
 #           results/noskip_place/<回路>.log  と  results/noskip_place/summary.csv
 #   ※ 並列本数の目安: 空きメモリ(GB) ÷ 2
@@ -26,38 +28,43 @@ JOBS=${JOBS:-2}
 ATIME=${ATIME:-1800}
 STEP=${STEP:-all}
 TOOL=${TOOL:-place_fixed_skip_ext.py}
-mkdir -p "$RES" "$RES/noskip_place"
+D0=${D0:-99}
+if [ "$D0" = 99 ]; then SFX=""; else SFX="_d0_${D0}"; fi
+EBR=$RES/eblif_relay$SFX; CONED=$RES/cone_noskip$SFX; PLACED=$RES/noskip_place$SFX
+if [ "$D0" != 99 ]; then CONED=$RES/cone_d0_$D0; PLACED=$RES/place_d0_$D0; fi
+mkdir -p "$RES" "$PLACED"
 
 if [ "$STEP" = all ] || [ "$STEP" = 1 ]; then
   echo "=== ① 中継挿入 ==="
-  (cd "$SRC" && python3 insert_relay.py) || exit 1
+  (cd "$SRC" && D0=$D0 OUTDIR="$EBR" python3 insert_relay.py) || exit 1
 fi
 if [ "$STEP" = all ] || [ "$STEP" = 2 ]; then
   echo "=== ② 回路ごとの skip無し構造（幅を数えるため） ==="
-  (cd "$SRC" && EBDIR="$RES/eblif_relay" OUTDIR="$RES/cone_noskip" SKIP_SPECS=2:0 python3 gen_ext_uniform_all.py) || exit 1
+  (cd "$SRC" && EBDIR="$EBR" OUTDIR="$CONED" SKIP_SPECS=2:0 python3 gen_ext_uniform_all.py) || exit 1
 fi
 if [ "$STEP" = all ] || [ "$STEP" = 3 ]; then
   echo "=== ③ 包絡線 → スーパーセット構造 ==="
-  (cd "$SRC" && SRC="$RES/cone_noskip" python3 superset_profile.py) || exit 1
-  (cd "$SRC" && PROFILE="$RES/superset_profile.json" OUT="$RES/superset_noskip.v" TAG=superset_noskip python3 gen_superset.py) || exit 1
+  (cd "$SRC" && SRC="$CONED" python3 superset_profile.py) || exit 1
+  if [ "$D0" = 99 ]; then SSV=$RES/superset_noskip.v; TAGN=superset_noskip; else SSV=$RES/superset_d0_$D0.v; TAGN=superset_d0_$D0; fi
+  (cd "$SRC" && PROFILE="$RES/superset_profile.json" OUT="$SSV" TAG=$TAGN python3 gen_superset.py) || exit 1
 fi
 if [ "$STEP" = all ] || [ "$STEP" = 4 ]; then
   echo "=== ④ 41回路をスーパーセットに段固定配置 (JOBS=$JOBS ATIME=$ATIME TOOL=$TOOL) ==="
-  CONE=$RES/superset_noskip.v
+  if [ "$D0" = 99 ]; then CONE=$RES/superset_noskip.v; else CONE=$RES/superset_d0_$D0.v; fi
   [ -f "$CONE" ] || { echo "$CONE が無い。STEP=3 を先に"; exit 1; }
-  if [ $# -gt 0 ]; then CKTS="$*"; else CKTS=$(ls "$RES/eblif_relay"); fi
+  if [ $# -gt 0 ]; then CKTS="$*"; else CKTS=$(ls "$EBR"); fi
   one() {
     c=$1
-    (cd "$SRC" && ATIME=$ATIME python3 "$TOOL" "$RES/eblif_relay/$c/mapped_$c.v.eblif" "$CONE") > "$RES/noskip_place/$c.log" 2>&1
-    r=$(grep -m1 "^結果:" "$RES/noskip_place/$c.log" | sed 's/^結果: //')
+    (cd "$SRC" && ATIME=$ATIME python3 "$TOOL" "$EBR/$c/mapped_$c.v.eblif" "$CONE") > "$PLACED/$c.log" 2>&1
+    r=$(grep -m1 "^結果:" "$PLACED/$c.log" | sed 's/^結果: //')
     echo "$c  $r"
   }
-  export -f one; export SRC RES ATIME CONE TOOL
+  export -f one; export SRC RES ATIME CONE TOOL EBR PLACED
   echo "$CKTS" | tr ' ' '\n' | xargs -P "$JOBS" -I{} bash -c 'one {}'
-  echo "circuit,result" > "$RES/noskip_place/summary.csv"
+  echo "circuit,result" > "$PLACED/summary.csv"
   for c in $CKTS; do
-    r=$(grep -m1 "^結果:" "$RES/noskip_place/$c.log" | sed 's/^結果: //' | cut -d' ' -f1)
-    echo "$c,$r" >> "$RES/noskip_place/summary.csv"
+    r=$(grep -m1 "^結果:" "$PLACED/$c.log" | sed 's/^結果: //' | cut -d' ' -f1)
+    echo "$c,$r" >> "$PLACED/summary.csv"
   done
-  echo; echo "=== 集計 ==="; cut -d, -f2 "$RES/noskip_place/summary.csv" | tail -n +2 | sort | uniq -c
+  echo; echo "=== 集計 ($PLACED/summary.csv) ==="; cut -d, -f2 "$PLACED/summary.csv" | tail -n +2 | sort | uniq -c
 fi

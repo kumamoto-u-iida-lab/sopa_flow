@@ -217,3 +217,12 @@ D0=4 JOBS=8 ATIME=3600 TOOL=place_fixed_tbl.py ./run_noskip_superset.sh
 ```
 出力は results/eblif_relay_d0_<D0>/ cone_d0_<D0>/ superset_d0_<D0>.v place_d0_<D0>/summary.csv。
 中継の規則: 信号ごとに鎖1本、鎖は「D0 未満の読み手のうち最遠」まで。D0 以上の読み手は skip トラックで受ける。
+
+## 実行マシンとの同期（2026-09-08 追加）
+tgz を Downloads 経由で運ぶのはやめ、実行マシン（iidalab / taurus2）では git で同期する。
+```bash
+./sync_check.sh          # git の遅れ・ローカル変更・環境(ortools/yosys)・生成物の有無を点検（何も変えない）
+./sync_check.sh --pull   # 遅れていれば git pull --ff-only（ローカル変更があれば止まる）
+```
+生成物（results/*.v, eblif_relay_*, area/rtl/sopa_conf/*.v）は git に入れない。点検で「無い」と出たら、示されたコマンドで実行マシン上で作る（SATなし、数分）。
+役割分担: iidalab = 配置配線（ortools）/ taurus2 = 面積（dc_shell）/ enpit1 = 島FPGA（VPR）。

@@ -37,6 +37,16 @@ with open(PROFILE, encoding="utf-8") as f:
 
 D = P["D"]
 widths = [P["env_width"][str(k)] for k in range(D)]          # 入力側 -> FF側
+# ★2026-09-09: 余白。MARGIN_SPEC="8-13:3" なら 段8〜13 の幅に +3（複数は ; 区切り）。
+#   全中継の超集合で中継が集中する中段（9/3: 段12→13 の結合で詰まる）に空き枠を足し、
+#   UNKNOWN 15回路が載るかを試すためのもの。config は 1枠 ≈ 2+2·⌈log2 n⌉ bit、面積 ≈ 1.2k μm² 増える。
+MARGIN_SPEC = os.environ.get("MARGIN_SPEC", "")
+if MARGIN_SPEC:
+    for spec in MARGIN_SPEC.split(";"):
+        rng, m = spec.split(":"); a, b = (rng.split("-") + [rng])[:2]
+        for k in range(int(a), int(b) + 1):
+            widths[k] += int(m)
+    print(f"余白 MARGIN_SPEC={MARGIN_SPEC} → 幅 {widths}")
 n_pi = P["pi_max"]
 env_skip = P["env_skip"]                                      # "c,d" -> 本数
 

@@ -226,3 +226,11 @@ tgz を Downloads 経由で運ぶのはやめ、実行マシン（iidalab / taur
 ```
 生成物（results/*.v, eblif_relay_*, area/rtl/sopa_conf/*.v）は git に入れない。点検で「無い」と出たら、示されたコマンドで実行マシン上で作る（SATなし、数分）。
 役割分担: iidalab = 配置配線（ortools）/ taurus2 = 面積（dc_shell）/ enpit1 = 島FPGA（VPR）。
+
+### 余白つきの全中継超集合（2026-09-09 追加）
+`MARGIN_SPEC="8-13:3"` で段 8〜13 の幅に +3 枠（中継が集中する中段に空きを作り、UNKNOWN の回路が載るかを試す）。
+```bash
+MARGIN_SPEC="8-13:3" STEP=3 ./run_noskip_superset.sh            # 構造だけ再生成（①②は既存を流用）→ results/superset_noskip_m8-13x3.v（11,335 bit）
+MARGIN_SPEC="8-13:3" STEP=4 JOBS=8 ATIME=7200 TOOL=place_fixed_tbl.py ./run_noskip_superset.sh e10 e16 e2 e4 bridge e8 e15 proc81616 robotben proc16816 proc1688 lcu pp max v16
+# 結果: results/noskip_place_m8-13x3/summary.csv
+```

@@ -234,3 +234,7 @@ MARGIN_SPEC="8-13:3" STEP=3 ./run_noskip_superset.sh            # 構造だけ�
 MARGIN_SPEC="8-13:3" STEP=4 JOBS=8 ATIME=7200 TOOL=place_fixed_tbl.py ./run_noskip_superset.sh e10 e16 e2 e4 bridge e8 e15 proc81616 robotben proc16816 proc1688 lcu pp max v16
 # 結果: results/noskip_place_m8-13x3/summary.csv
 ```
+
+## structures/ — スーパーセットの構造 Verilog（2026-09-09 追加）
+41 回路が載る 18 段の超集合 5 本（全部 skip / gap2 中継 / gap3 中継 / 全部中継 / 全部中継＋余白）を `structures/` に置いた。
+各ファイルの総PA・skip 本数・構成メモリ・面積（構成メモリ込み）・載った回路数・再生成コマンドは `structures/README.md` の表を参照。

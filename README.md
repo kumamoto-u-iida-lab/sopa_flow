@@ -238,3 +238,11 @@ MARGIN_SPEC="8-13:3" STEP=4 JOBS=8 ATIME=7200 TOOL=place_fixed_tbl.py ./run_nosk
 ## structures/ — スーパーセットの構造 Verilog（2026-09-09 追加）
 41 回路が載る 18 段の超集合 5 本（全部 skip / gap2 中継 / gap3 中継 / 全部中継 / 全部中継＋余白）を `structures/` に置いた。
 各ファイルの総PA・skip 本数・構成メモリ・面積（構成メモリ込み）・載った回路数・再生成コマンドは `structures/README.md` の表を参照。
+
+### 各回路の専用構造に載せる（2026-09-14 追加）
+`OWN=1` で ④ を「超集合」でなく「②で作った回路ごとの構造（cone_noskip/ や cone_d0_<D0>/）」に向ける。
+中継化した構造が自分ちょうどの幅でも載るかを見るためのもの。出力は results/noskip_place_own/（D0 指定時は place_d0_<D0>_own/）。
+```bash
+OWN=1 STEP=4 JOBS=8 ATIME=3600 TOOL=place_fixed_tbl.py ./run_noskip_superset.sh          # 全中継、41回路
+D0=3 OWN=1 STEP=4 JOBS=8 ATIME=3600 TOOL=place_fixed_tbl.py ./run_noskip_superset.sh     # gap2まで中継
+```

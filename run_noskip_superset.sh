@@ -18,6 +18,7 @@
 #             D0(この距離未満だけ中継、以上は skip。既定 99=全部中継。ケース(1) gap2まで中継=3、ケース(2) gap3まで中継=4)
 #             D0 を付けると出力は results/eblif_relay_d0_<D0>/ cone_d0_<D0>/ superset_d0_<D0>.v place_d0_<D0>/ に分かれる
 #             MARGIN_SPEC="8-13:3" 段8〜13 に +3 枠（③の構造生成と④の配置に効く。出力名に _m8-13x3 が付く）
+#             OWN=1  ④で超集合でなく【各回路の専用構造】（②で作った cone_*/<回路>.v）に載せる。出力は place_*_own/
 #   出力:   results/eblif_relay/ results/cone_noskip/ results/superset_profile.json results/superset_noskip.v
 #           results/noskip_place/<回路>.log  と  results/noskip_place/summary.csv
 #   ※ 並列本数の目安: 空きメモリ(GB) ÷ 2
@@ -31,6 +32,7 @@ STEP=${STEP:-all}
 TOOL=${TOOL:-place_fixed_skip_ext.py}
 D0=${D0:-99}
 MARGIN_SPEC=${MARGIN_SPEC:-}
+OWN=${OWN:-0}
 MSFX=""; [ -n "$MARGIN_SPEC" ] && MSFX="_m$(echo "$MARGIN_SPEC" | tr ":;" "x_")"
 if [ "$D0" = 99 ]; then SFX=""; else SFX="_d0_${D0}"; fi
 EBR=$RES/eblif_relay$SFX; CONED=$RES/cone_noskip$SFX; PLACED=$RES/noskip_place$SFX
@@ -52,18 +54,25 @@ if [ "$STEP" = all ] || [ "$STEP" = 3 ]; then
   (cd "$SRC" && MARGIN_SPEC="$MARGIN_SPEC" PROFILE="$RES/superset_profile.json" OUT="$SSV" TAG=$TAGN python3 gen_superset.py) || exit 1
 fi
 if [ "$STEP" = all ] || [ "$STEP" = 4 ]; then
-  echo "=== ④ 41回路をスーパーセットに段固定配置 (JOBS=$JOBS ATIME=$ATIME TOOL=$TOOL) ==="
+  echo "=== ④ 41回路を$([ "$OWN" = 1 ] && echo 各回路の専用構造 || echo スーパーセット)に段固定配置 (JOBS=$JOBS ATIME=$ATIME TOOL=$TOOL D0=$D0 OWN=$OWN) ==="
   if [ "$D0" = 99 ]; then CONE=$RES/superset_noskip$MSFX.v; else CONE=$RES/superset_d0_$D0$MSFX.v; fi
   [ -n "$MSFX" ] && PLACED="${PLACED}${MSFX}" && mkdir -p "$PLACED"
-  [ -f "$CONE" ] || { echo "$CONE が無い。STEP=3 を先に"; exit 1; }
+  if [ "$OWN" = 1 ]; then
+    # ★各回路の専用構造に載せる（超集合は使わない）。構造は ② の出力 $CONED/<回路>.v
+    CONE=OWN; PLACED="${PLACED}_own"; mkdir -p "$PLACED"
+    [ -d "$CONED" ] || { echo "$CONED が無い。STEP=2 を先に"; exit 1; }
+  else
+    [ -f "$CONE" ] || { echo "$CONE が無い。STEP=3 を先に"; exit 1; }
+  fi
   if [ $# -gt 0 ]; then CKTS="$*"; else CKTS=$(ls "$EBR"); fi
   one() {
     c=$1
-    (cd "$SRC" && ATIME=$ATIME python3 "$TOOL" "$EBR/$c/mapped_$c.v.eblif" "$CONE") > "$PLACED/$c.log" 2>&1
+    cone="$CONE"; [ "$CONE" = OWN ] && cone="$CONED/$c.v"
+    (cd "$SRC" && ATIME=$ATIME python3 "$TOOL" "$EBR/$c/mapped_$c.v.eblif" "$cone") > "$PLACED/$c.log" 2>&1
     r=$(grep -m1 "^結果:" "$PLACED/$c.log" | sed 's/^結果: //')
     echo "$c  $r"
   }
-  export -f one; export SRC RES ATIME CONE TOOL EBR PLACED
+  export -f one; export SRC RES ATIME CONE TOOL EBR PLACED CONED
   echo "$CKTS" | tr ' ' '\n' | xargs -P "$JOBS" -I{} bash -c 'one {}'
   echo "circuit,result" > "$PLACED/summary.csv"
   for c in $CKTS; do

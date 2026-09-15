@@ -254,3 +254,10 @@ cat: 135 → 151 セル、1,595 → 1,757 bit。複製なしは INFEASIBLE（93 
 JOBS=4 ATIME=14400 MAXF=2 ./run_dup.sh cat          # 回路を省略すると INFEASIBLE だった14回路
 # 出力: results/eblif_dup_f2/ cone_dup_f2/ place_dup_f2/summary.csv
 ```
+
+### 細くなる段に余白を足した専用構造（2026-09-15 追加）
+5回のなぜの結論: 幅＝セル数ちょうど（余白ゼロ）なので、FF 側の細くなる帯で前段の出力が次段の口にぴったり入り詰まる（indep の核＝段6〜9、段7→8 は 18 口に 18 本）。
+`MARGIN=M` は「幅が前段以下の段」に +M 枠。複製なしの中継 eblif（results/eblif_relay）で INFEASIBLE だった14回路を回す。
+```bash
+MARGINS="1 2 3" JOBS=8 ATIME=3600 ./run_margin_own.sh      # 出力: results/place_own_m<M>/summary.csv（config の増分つき）
+```

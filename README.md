@@ -246,3 +246,11 @@ MARGIN_SPEC="8-13:3" STEP=4 JOBS=8 ATIME=7200 TOOL=place_fixed_tbl.py ./run_nosk
 OWN=1 STEP=4 JOBS=8 ATIME=3600 TOOL=place_fixed_tbl.py ./run_noskip_superset.sh          # 全中継、41回路
 D0=3 OWN=1 STEP=4 JOBS=8 ATIME=3600 TOOL=place_fixed_tbl.py ./run_noskip_superset.sh     # gap2まで中継
 ```
+
+### fanout 複製版（2026-09-15 追加）
+中継入り eblif で「次段の読み手が MAXF を超えるセル」を複製して fanout を MAXF 以下にし（親の fanout も増えるので FF 側から連鎖処理）、その eblif の専用構造に載せる。
+cat: 135 → 151 セル、1,595 → 1,757 bit。複製なしは INFEASIBLE（93 秒で証明）、複製版は 600 秒で UNKNOWN。
+```bash
+JOBS=4 ATIME=14400 MAXF=2 ./run_dup.sh cat          # 回路を省略すると INFEASIBLE だった14回路
+# 出力: results/eblif_dup_f2/ cone_dup_f2/ place_dup_f2/summary.csv
+```

@@ -18,7 +18,7 @@
 #             D0(この距離未満だけ中継、以上は skip。既定 99=全部中継。ケース(1) gap2まで中継=3、ケース(2) gap3まで中継=4)
 #             D0 を付けると出力は results/eblif_relay_d0_<D0>/ cone_d0_<D0>/ superset_d0_<D0>.v place_d0_<D0>/ に分かれる
 #             MARGIN_SPEC="8-13:3" 段8〜13 に +3 枠（③の構造生成と④の配置に効く。出力名に _m8-13x3 が付く）
-#             CAND_RULE=cyclic  ④の候補表を巡回に（place_fixed_tbl.py のみ対応。出力 dir に _cyclic）
+#             CAND_RULE=cyclic|cyclic_eq  ④の候補表を巡回に（cyclic_eq=行ごとの候補数を今と同一の公平版。place_fixed_tbl.py のみ対応。出力 dir に _<規則>）
 #             OWN=1  ④で超集合でなく【各回路の専用構造】（②で作った cone_*/<回路>.v）に載せる。出力は place_*_own/
 #   出力:   results/eblif_relay/ results/cone_noskip/ results/superset_profile.json results/superset_noskip.v
 #           results/noskip_place/<回路>.log  と  results/noskip_place/summary.csv

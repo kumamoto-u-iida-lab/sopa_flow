@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""cand_rules.py — 段間の候補表（次段の行 r が前段のどの行から入力を選べるか）の作り方（2026-09-17）
+   now    : 今の規則 gen_pattern = A_k=min(N,⌊2N/k⌋)。前段の若い行ほど多くの行に届く（偏りあり）
+   cyclic : 巡回。前段の行を 0,s,2s,…(mod ns) と並べた列を先頭から d 個ずつ次段の行0,1,… に配る。
+            s は ns と互いに素 → 列は前段の全行を一巡するので、届く回数の差は行ごとに1以内・届かない行ゼロ。
+            d = ⌈今の規則の候補総数 / 次段幅⌉（候補の総数を今とほぼ同じにそろえる）
+   使い方: from cand_rules import make_cand; make_cand(ns, nd, rule)
+"""
+import math
+from place_greedy import gen_pattern
+
+def make_cand(ns, nd, rule="now"):
+    base = gen_pattern(ns, nd)
+    if rule == "now":
+        return base
+    if rule != "cyclic":
+        raise ValueError(f"未知の CAND_RULE: {rule}")
+    d = min(ns, max(1, math.ceil(sum(len(b) for b in base) / nd)))
+    s = max(1, ns // d)
+    while s > 1 and math.gcd(s, ns) != 1:
+        s -= 1
+    seq = [(j * s) % ns for j in range(ns)]          # 前段の全行を1回ずつ
+    return [sorted({seq[(r * d + j) % ns] for j in range(d)}) for r in range(nd)]
+
+def reach(cand, ns):
+    r = [0] * ns
+    for row in cand:
+        for k in row:
+            r[k] += 1
+    return r
+
+if __name__ == "__main__":
+    import sys
+    ns, nd = int(sys.argv[1]), int(sys.argv[2])
+    for rule in ("now", "cyclic"):
+        c = make_cand(ns, nd, rule)
+        rc = reach(c, ns)
+        print(f"{rule:<6} 候補{sum(map(len, c))}本  届く先 最大{max(rc)} 最小{min(rc)}  {rc}")

@@ -8,11 +8,12 @@
  - next_ext[c] は .v ヘッダ "N_EXT_LIST=[...]"(入力側->FF側) から読む。無ければ全0(=PI要求があれば不可)。
  使い方: python3 place_fixed_skip_ext.py <EBLIF> <CONE_V> [HOME_EBLIF]   環境: ATIME(秒, default120)
 """
-import sys, os, re, json
+import sys, math, os, re, json
 from collections import defaultdict
 from ortools.sat.python import cp_model
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from place_greedy import load, gen_pattern
+from cand_rules import make_cand   # ★2026-09-17 環境 CAND_RULE=now(既定)/cyclic
 
 EB, GRIDV = sys.argv[1], sys.argv[2]
 HOME = sys.argv[3] if len(sys.argv) > 3 else None
@@ -133,7 +134,12 @@ if over:
     print(f"結果: INFEASIBLE(skip枠不足) 超過(段,距離,需要,枠)={over}  skip総数={nskip}")
     sys.exit()
 
-cand = {col: gen_pattern(widths[col - 1], widths[col]) for col in range(1, D)}
+CAND_RULE = os.environ.get("CAND_RULE", "now")
+cand = {col: make_cand(widths[col - 1], widths[col], CAND_RULE) for col in range(1, D)}
+_sel = lambda n: max(1, math.ceil(math.log2(n))) if n > 1 else 0
+_now = {col: gen_pattern(widths[col - 1], widths[col]) for col in range(1, D)}
+print(f"候補規則 CAND_RULE={CAND_RULE}: 候補 {sum(len(x) for c in cand for x in cand[c])} 本 (now {sum(len(x) for c in _now for x in _now[c])})"
+      f"  段間imux選択bitの目安 {sum(2*_sel(len(x)) for c in cand for x in cand[c])} (now {sum(2*_sel(len(x)) for c in _now for x in _now[c])})", flush=True)
 m = cp_model.CpModel()
 row = {o: m.NewIntVar(0, widths[col_of[o]] - 1, '') for o in cbo}
 for col, cs in bycol.items():

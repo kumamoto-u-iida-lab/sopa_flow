@@ -9,6 +9,7 @@
 | superset_gap2relay.v | gap2 は中継、gap≥3 は skip（ケース(1)） | 576 | 287 | 10,580 | 575,672 | 39/41（bridge, e4 未決着） | `D0=3` |
 | superset_gap3relay.v | gap2,3 は中継、gap≥4 は skip（ケース(2)） | 664 | 182 | 11,353 | 590,325 | 32/41 | `D0=4` |
 | superset_allrelay.v | 全部中継（skip なし） | 792 | 0 | 11,083 | 543,682 | 26/41 | `D0=99` |
+| superset_allrelay_cyclic_eq.v | 全部中継・**候補表を巡回（本数そろえ版 cyclic_eq）**。幅・MUX の大きさ・bit は superset_allrelay.v と同一、つなぎ先だけ違う（9/17） | 792 | 0 | 11,083 | （測定中） | （未配置） | `CAND_RULE=cyclic_eq` gen_cone_ext.py（下記） |
 | superset_allrelay_margin8-13x3.v | 全部中継 ＋ 段8〜13 に +3 枠 | 810 | 0 | 11,335 | （未測定） | 残り15回路 0/15（7,200s） | `D0=99 MARGIN_SPEC=8-13:3` |
 
 配置は段固定 CP-SAT（src/place_fixed_tbl.py、表制約版）、iidalab JOBS=8 ATIME=3,600〜7,200s。「載った」は OPTIMAL、未決着は UNKNOWN（INFEASIBLE は全構造で 0）。
@@ -16,3 +17,11 @@
 
 トップモジュールは `cone`（CLK, PAE_RST_N, I[1:0], EXT[44:0], pa_o[6:0], CONFIG_DATA[N-1:0]）。
 構成メモリ込みの面積測定用トップ（SOPA_CORE）は `src/gen_conf_chain.py <構造.v> <出力.v>` で付ける。
+
+## 巡回版の再生成（2026-09-17）
+```bash
+cd src && CAND_RULE=cyclic_eq SKIP_SPECS=2:0 NEXT=0$(printf ',45%.0s' $(seq 17)) NEXTTAG=allrelay \
+  python3 gen_cone_ext.py 7,12,23,43,64,99,131,119,97,72,43,30,21,14,9,4,3,1
+```
+CAND_RULE=now で同じコマンドを打つと superset_allrelay.v とコメント行以外 完全一致（確認済み）。
+面積用: `python3 src/gen_conf_chain.py structures/superset_allrelay_cyclic_eq.v area/rtl/sopa_conf/superset_allrelay_cyclic_eq.v`（この1本だけ git 管理）

@@ -66,7 +66,8 @@ ff_index = {}; _k = 0
 for c in FFSTAGES:
     for i in range(widths[c]):
         ff_index[(c, i)] = _k; _k += 1
-patterns = [gen_pattern(widths[s], widths[s + 1]) for s in range(D - 1)]
+from cand_rules import make_cand   # ★2026-09-17 CAND_RULE は構造生成時と同じ値を渡すこと
+patterns = [make_cand(widths[s], widths[s + 1], os.environ.get("CAND_RULE", "now")) for s in range(D - 1)]
 
 # ---- CONFIG_DATA レイアウト (gen_cone_ext と同順: skip→imux→pa→ff) ----
 pos = 0; skip_cfg = {}

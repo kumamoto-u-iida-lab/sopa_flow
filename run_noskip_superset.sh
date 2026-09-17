@@ -19,6 +19,7 @@
 #             D0 を付けると出力は results/eblif_relay_d0_<D0>/ cone_d0_<D0>/ superset_d0_<D0>.v place_d0_<D0>/ に分かれる
 #             MARGIN_SPEC="8-13:3" 段8〜13 に +3 枠（③の構造生成と④の配置に効く。出力名に _m8-13x3 が付く）
 #             CAND_RULE=cyclic|cyclic_eq  ④の候補表を巡回に（cyclic_eq=行ごとの候補数を今と同一の公平版。place_fixed_tbl.py のみ対応。出力 dir に _<規則>）
+#             SUPERSET=<構造.v>  ④で使う超集合を直接指定（CAND_RULE はその構造を作ったときと同じにすること）
 #             OWN=1  ④で超集合でなく【各回路の専用構造】（②で作った cone_*/<回路>.v）に載せる。出力は place_*_own/
 #   出力:   results/eblif_relay/ results/cone_noskip/ results/superset_profile.json results/superset_noskip.v
 #           results/noskip_place/<回路>.log  と  results/noskip_place/summary.csv
@@ -57,6 +58,7 @@ fi
 if [ "$STEP" = all ] || [ "$STEP" = 4 ]; then
   echo "=== ④ 41回路を$([ "$OWN" = 1 ] && echo 各回路の専用構造 || echo スーパーセット)に段固定配置 (JOBS=$JOBS ATIME=$ATIME TOOL=$TOOL D0=$D0 OWN=$OWN CAND_RULE=${CAND_RULE:-now}) ==="
   if [ "$D0" = 99 ]; then CONE=$RES/superset_noskip$MSFX.v; else CONE=$RES/superset_d0_$D0$MSFX.v; fi
+  [ -n "${SUPERSET:-}" ] && CONE=$(cd "$(dirname "$SUPERSET")" && pwd)/$(basename "$SUPERSET")   # ★9/17 構造ファイルを直接指定（例 structures/superset_allrelay_cyclic_eq.v）
   [ -n "$MSFX" ] && PLACED="${PLACED}${MSFX}" && mkdir -p "$PLACED"
   if [ "$OWN" = 1 ]; then
     # ★各回路の専用構造に載せる（超集合は使わない）。構造は ② の出力 $CONED/<回路>.v

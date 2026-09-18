@@ -62,8 +62,6 @@ for s in range(D - 1):
     else:
         from cand_rules import make_cand
         patterns.append(make_cand(widths[s], widths[s + 1], CAND_RULE))
-if CAND_RULE != "now":
-    TAG += "_" + CAND_RULE
 print(f"候補規則 CAND_RULE={CAND_RULE}  候補総数={sum(len(x) for p in patterns for x in p)}")
 
 print(f"幅(入力側->FF側) = {widths}   段数D={D}  FF={B}個")

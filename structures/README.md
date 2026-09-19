@@ -10,6 +10,8 @@
 | superset_gap3relay.v | gap2,3 は中継、gap≥4 は skip（ケース(2)） | 664 | 182 | 11,353 | 590,325 | 32/41 | `D0=4` |
 | superset_allrelay.v | 全部中継（skip なし） | 792 | 0 | 11,083 | 543,682 | 26/41 | `D0=99` |
 | superset_allrelay_cyclic_eq.v | 全部中継・**候補表を巡回（本数そろえ版 cyclic_eq）**。幅・MUX の大きさ・bit は superset_allrelay.v と同一、つなぎ先だけ違う（9/17） | 792 | 0 | 11,083 | （測定中） | （未配置） | `CAND_RULE=cyclic_eq` gen_cone_ext.py（下記） |
+| superset_allrelay_s125.v | 全部中継・**列数を 1.25 倍**（占有率 80%、切り上げ、FF も 7→9）。今の規則（9/19） | 996 | 0 | 15,189 | （未測定） | （未配置） | `SCALE=1.25 PROFILE=results/profile_d0_99.json` gen_superset.py |
+| superset_allrelay_s125_cyclic_eq.v | 同上の配線を巡回（本数そろえ版）にした版（9/19） | 996 | 0 | 15,189 | （未測定） | （未配置） | 上に `CAND_RULE=cyclic_eq` を足す |
 | superset_allrelay_margin8-13x3.v | 全部中継 ＋ 段8〜13 に +3 枠 | 810 | 0 | 11,335 | （未測定） | 残り15回路 0/15（7,200s） | `D0=99 MARGIN_SPEC=8-13:3` |
 
 配置は段固定 CP-SAT（src/place_fixed_tbl.py、表制約版）、iidalab JOBS=8 ATIME=3,600〜7,200s。「載った」は OPTIMAL、未決着は UNKNOWN（INFEASIBLE は全構造で 0）。

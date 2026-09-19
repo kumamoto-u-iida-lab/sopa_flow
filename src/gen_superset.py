@@ -24,7 +24,7 @@
   【上位集合とは限らない】。よって「項目ごとに max を取れば全部載る」は保証されない。
   → 作って41回路を回して確かめるしかない。落ちたら幅か skip を足す。
 """
-import os, sys, json, subprocess, shutil
+import os, sys, json, subprocess, shutil, math
 
 SD = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(SD)
@@ -40,6 +40,14 @@ widths = [P["env_width"][str(k)] for k in range(D)]          # 入力側 -> FF�
 # ★2026-09-09: 余白。MARGIN_SPEC="8-13:3" なら 段8〜13 の幅に +3（複数は ; 区切り）。
 #   全中継の超集合で中継が集中する中段（9/3: 段12→13 の結合で詰まる）に空き枠を足し、
 #   UNKNOWN 15回路が載るかを試すためのもの。config は 1枠 ≈ 2+2·⌈log2 n⌉ bit、面積 ≈ 1.2k μm² 増える。
+# ★2026-09-19: 列数の定数倍。SCALE=1.25 なら「今の列数が新しい列数の8割」になるよう切り上げる。
+#   占有率を下げると載る回路が増えるかを見るためのもの。MARGIN_SPEC より先に適用する。
+SCALE = float(os.environ.get("SCALE", "1"))
+if SCALE != 1:
+    before = list(widths)
+    widths = [max(1, math.ceil(w * SCALE)) for w in widths]
+    print(f"列数を {SCALE} 倍（切り上げ）\n  前: {before}\n  後: {widths}   合計 {sum(before)} → {sum(widths)}")
+
 MARGIN_SPEC = os.environ.get("MARGIN_SPEC", "")
 if MARGIN_SPEC:
     for spec in MARGIN_SPEC.split(";"):

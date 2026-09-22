@@ -16,6 +16,8 @@ cd area && JOBS=1 ./run_conf.sh |& tee run_conf.log     # ③ 1プロセス1構�
 | SoPA gap2まで中継 | SOPA_CORE | 10,580 | rtl/sopa_conf/superset_d0_3.v |
 | SoPA gap3まで中継 | SOPA_CORE | 11,353 | rtl/sopa_conf/superset_d0_4.v |
 | SoPA 全部中継 | SOPA_CORE | 11,083 | rtl/sopa_conf/superset_noskip.v |
+| ★SoPA 全部中継・交互(alt_cyc) 37/41 | SOPA_CORE | 11,083 | rtl/sopa_conf/superset_allrelay_alt_cyc.v（git 管理、9/23） |
+| ★SoPA 列数1.25倍・交互(alt_cyc) 41/41 | SOPA_CORE | 15,189 | rtl/sopa_conf/superset_allrelay_s125_alt_cyc.v（git 管理、9/23） |
 | SoPA 全部中継・巡回(cyclic_eq) | SOPA_CORE | 11,083 | rtl/sopa_conf/superset_allrelay_cyclic_eq.v（★git 管理、9/17） |
 | IPGen 超集合 x11_y17_om19_pi45 | FPGA_CORE | 10,184 | rtl/ipgen_conf/superset/（EFPGA_CORE 一式 + FPGA_CORE_conf.v、git 管理） |
 

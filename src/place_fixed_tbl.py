@@ -135,7 +135,7 @@ if over:
     sys.exit()
 
 CAND_RULE = os.environ.get("CAND_RULE", "now")
-cand = {col: make_cand(widths[col - 1], widths[col], CAND_RULE) for col in range(1, D)}
+cand = {col: make_cand(widths[col - 1], widths[col], CAND_RULE, row=col) for col in range(1, D)}
 _sel = lambda n: max(1, math.ceil(math.log2(n))) if n > 1 else 0
 _now = {col: gen_pattern(widths[col - 1], widths[col]) for col in range(1, D)}
 print(f"候補規則 CAND_RULE={CAND_RULE}: 候補 {sum(len(x) for c in cand for x in cand[c])} 本 (now {sum(len(x) for c in _now for x in _now[c])})"

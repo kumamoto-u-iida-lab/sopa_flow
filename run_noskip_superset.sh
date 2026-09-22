@@ -37,7 +37,10 @@ MARGIN_SPEC=${MARGIN_SPEC:-}
 OWN=${OWN:-0}
 MSFX=""; [ -n "$MARGIN_SPEC" ] && MSFX="_m$(echo "$MARGIN_SPEC" | tr ":;" "x_")"
 if [ "$D0" = 99 ]; then SFX=""; else SFX="_d0_${D0}"; fi
-EBR=$RES/eblif_relay$SFX; CONED=$RES/cone_noskip$SFX; PLACED=$RES/noskip_place$SFX
+# ★9/23: EBR / PLACED は環境変数で差し替え可（medium ベンチ用）。例:
+#   EBR=data/eblif_relay_medium PLACED=results/place_medium
+EBR=${EBR:-$RES/eblif_relay$SFX}; CONED=${CONED:-$RES/cone_noskip$SFX}; PLACED=${PLACED:-$RES/noskip_place$SFX}
+[ "${EBR#/}" = "$EBR" ] && EBR=$ROOT/$EBR; [ "${PLACED#/}" = "$PLACED" ] && PLACED=$ROOT/$PLACED
 if [ "$D0" != 99 ]; then CONED=$RES/cone_d0_$D0; PLACED=$RES/place_d0_$D0; fi
 mkdir -p "$RES" "$PLACED"
 

@@ -29,3 +29,19 @@ cd src && CAND_RULE=cyclic_eq SKIP_SPECS=2:0 NEXT=0$(printf ',45%.0s' $(seq 17))
 ```
 CAND_RULE=now で同じコマンドを打つと superset_allrelay.v とコメント行以外 完全一致（確認済み）。
 面積用: `python3 src/gen_conf_chain.py structures/superset_allrelay_cyclic_eq.v area/rtl/sopa_conf/superset_allrelay_cyclic_eq.v`（この1本だけ git 管理）
+
+## medium ベンチマーク（state_Medium_no_dec, 42回路, 2026-09-23）
+small（41回路）で交互が効いたのが小規模特有かを確かめるための一式。alf と mogi は元 Verilog の文法エラー（入力名の抜け）で除外。
+RTL → eblif は `RTL_DIR=rtl_medium OUTDIR=results/eblif_medium python3 src/rtl_to_eblif.py <回路名...>`、
+中継挿入は `EBDIR=results/eblif_medium OUTDIR=results/eblif_relay_medium D0=99 python3 src/insert_relay.py`。
+中継入り eblif は data/eblif_relay_medium/ に同梱（4.0MB）。
+
+| ファイル | 規則 | 列数(入力側->FF側) | PA | 構成メモリ |
+|---|---|---|---|---|
+| superset_medium_s125_now.v | 今の規則 | [3,8,14,20,49,80,127,227,322,388,385,353,370,318,208,122,69,40,20,12] | 3,135 | 50,130 bit |
+| superset_medium_s125_cyclic_eq.v | 巡回 | 同上 | 3,135 | 50,130 bit |
+| superset_medium_s125_alt_cyc.v | 交互 | 同上 | 3,135 | 50,130 bit |
+
+列数1.25倍（占有率80%）。3種とも列数・MUX・bit は完全に同一で、違うのは配線の相手だけ。
+配線とツールの候補表が 6,264 入力すべて一致することを確認済み。
+配置配線: `STEP=4 TOOL=place_fixed_tbl.py CAND_RULE=<規則> SUPERSET=structures/superset_medium_s125_<規則>.v EBR=... ./run_noskip_superset.sh`

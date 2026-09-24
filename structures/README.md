@@ -70,3 +70,5 @@ RTL → eblif は `RTL_DIR=rtl_medium OUTDIR=results/eblif_medium python3 src/rt
   後（減少部だけ複製）               [1,3,4,9,14,21,30,43,72,97,119,134,119,78,44,24,12,7] = 831PA / 11,629bit（+4.9%）
   変わったのは行11〜15 だけ（+3,+20,+14,+1,+1）。3規則とも列数・MUX・bit 同一、配線 1,660 入力で検証済み。
 配置: `STEP=4 TOOL=place_fixed_tbl.py CAND_RULE=<規則> SUPERSET=structures/superset_dupdec_<規則>.v EBR=data/eblif_relay_dupdec PLACED=results/place_dupdec_<規則> ./run_noskip_superset.sh`
+  列数1.25倍版（superset_dupdec_s125_*.v, 9/25）: [2,4,5,12,18,27,38,54,90,122,149,168,149,98,55,30,15,9] = 1,045PA / 16,003bit
+    （複製なしの s125 は 996PA / 15,189bit → +4.9% / +5.4%）

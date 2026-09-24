@@ -45,3 +45,19 @@ RTL → eblif は `RTL_DIR=rtl_medium OUTDIR=results/eblif_medium python3 src/rt
 列数1.25倍（占有率80%）。3種とも列数・MUX・bit は完全に同一で、違うのは配線の相手だけ。
 配線とツールの候補表が 6,264 入力すべて一致することを確認済み。
 配置配線: `STEP=4 TOOL=place_fixed_tbl.py CAND_RULE=<規則> SUPERSET=structures/superset_medium_s125_<規則>.v EBR=... ./run_noskip_superset.sh`
+
+## 幅の減少部だけ複製した専用構造（2026-09-24、dup_dec/）
+「詰まりは FF 側の列数が減る帯にあり、複製は入力側にしか効かない」ことが分かったので、
+列数が減り始める行から FF 側だけ fanout≤1 に複製した専用構造（余白ゼロ・全中継）。
+中継入り eblif は data/eblif_dup_dec/ に同梱。作り方:
+  `MAXF=1 MINROW=<減り始める行> python3 src/dup_fanout.py <in> <out>`（MINROW は 9/24 に追加）
+  `EBDIR=data/eblif_dup_dec OUTDIR=structures/dup_dec SKIP_SPECS=2:0 python3 src/gen_ext_uniform_all.py <回路>`
+| 回路 | MINROW | セル 前→後 | config 前→後 | 複製なし・今の規則 |
+|---|---|---|---|---|
+| indep | 6 | 170→178 (+4.7%) | 2,026→2,122 | INFEASIBLE 1s |
+| lift | 5 | 257→304 (+18.3%) | 3,080→3,662 | INFEASIBLE |
+| e7 | 8 | 531→570 (+7.3%) | 6,315→6,836 | INFEASIBLE 31s |
+| e2 | 7 | 598→633 (+5.9%) | 8,374→8,856 | INFEASIBLE |
+| lcu | 7 | 517→610 (+18.0%) | 6,893→8,146 | INFEASIBLE |
+| e16 | 7 | 642→719 (+12.0%) | 7,679→8,644 | INFEASIBLE 44s |
+手元での既知の結果: indep は今の規則 600s 決着せず / 巡回 OPTIMAL 14〜21s / 交互 600s 決着せず。

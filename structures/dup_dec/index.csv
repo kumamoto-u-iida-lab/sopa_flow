@@ -1,0 +1,7 @@
+circuit,cells,D,nPI,skip_demand,config_bit,status
+e16,719,14,15,0,8644,OK
+e2,633,13,45,0,8856,OK
+e7,570,14,14,0,6836,OK
+indep,178,10,8,0,2122,OK
+lcu,610,14,17,0,8146,OK
+lift,304,11,16,0,3662,OK

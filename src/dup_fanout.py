@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 """dup_fanout.py — （2026-09-15）中継入り eblif で fanout(次段の相異なる読み手セル数) が MAXF を超えるセルを複製して MAXF 以下にする。
    FF側の段から入力側へ処理（コピーは元と同じ入力を読むので親の fanout が増える → 親も後で処理される）。
-   使い方: python3 dup_fanout.py <in eblif> <out eblif>   環境: MAXF(既定2)
+   使い方: python3 dup_fanout.py <in eblif> <out eblif>   環境: MAXF(既定2) MINROW(この行以降だけ複製、既定0=全部)
 """
 import sys,os,re,math
 from collections import defaultdict,Counter
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from place_greedy import load
 IN,OUT=sys.argv[1],sys.argv[2]; MAXF=int(os.environ.get("MAXF","2"))
+MINROW=int(os.environ.get("MINROW","0"))   # ★9/24: この行以降（FF側）だけ複製する
 lines=open(IN).read().splitlines()
 # セル定義を読む（.subckt cell の行と直後の .param MODE）
 cells={}; order=[]; other=[]; i=0
@@ -41,7 +42,7 @@ def readers():
     return rd
 for o,lst in readers().items(): before[len(lst)]+=1
 added=Counter(); ncopy=0
-for stage in range(D-2,-1,-1):
+for stage in range(D-2,MINROW-1,-1):   # ★MINROW 未満の行は触らない
     rd=readers()
     for o in [x for x in list(cells) if col.get(x)==stage]:
         lst=rd.get(o,[])

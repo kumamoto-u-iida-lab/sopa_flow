@@ -61,3 +61,12 @@ RTL → eblif は `RTL_DIR=rtl_medium OUTDIR=results/eblif_medium python3 src/rt
 | lcu | 7 | 517→610 (+18.0%) | 6,893→8,146 | INFEASIBLE |
 | e16 | 7 | 642→719 (+12.0%) | 7,679→8,644 | INFEASIBLE 44s |
 手元での既知の結果: indep は今の規則 600s 決着せず / 巡回 OPTIMAL 14〜21s / 交互 600s 決着せず。
+
+## ★スーパーセット：幅の減少部だけ複製したネットリスト版（2026-09-25、superset_dupdec_*.v）
+41回路それぞれで「列数が前の行より減り始める行」から FF 側だけ fanout<=1 に複製（dup_fanout.py MAXF=1 MINROW=<回路ごと>）。
+中継入り・減少部複製済みの eblif 41本を data/eblif_relay_dupdec/ に同梱（1.7MB）。セル合計 13,407 → 14,443（+7.7%）。
+超集合の列数（入力側->FF側、列数1.0倍）:
+  前（複製なし, superset_allrelay.v） [1,3,4,9,14,21,30,43,72,97,119,131,99,64,43,23,12,7] = 792PA / 11,083bit
+  後（減少部だけ複製）               [1,3,4,9,14,21,30,43,72,97,119,134,119,78,44,24,12,7] = 831PA / 11,629bit（+4.9%）
+  変わったのは行11〜15 だけ（+3,+20,+14,+1,+1）。3規則とも列数・MUX・bit 同一、配線 1,660 入力で検証済み。
+配置: `STEP=4 TOOL=place_fixed_tbl.py CAND_RULE=<規則> SUPERSET=structures/superset_dupdec_<規則>.v EBR=data/eblif_relay_dupdec PLACED=results/place_dupdec_<規則> ./run_noskip_superset.sh`

@@ -78,3 +78,9 @@ RTL → eblif は `RTL_DIR=rtl_medium OUTDIR=results/eblif_medium python3 src/rt
 行き先の行番号 <=11（行10→行11 まで）は今の規則、行11→行12 以降（FF 側）は巡回（cyclic_eq）。
 狙い: 入力側は多くに配るセルの受け皿（万能列）を残し、FF 側は届く先の少ない列を無くす。
 配置: `STEP=4 TOOL=place_fixed_tbl.py CAND_RULE=split11 SUPERSET=structures/superset_allrelay_s125_split11.v ./run_noskip_superset.sh`
+
+## 列数の増減で規則を切り替えた版（2026-09-25、CAND_RULE=grow_now）
+行間ごとに、次の行の列数が増えるなら今の規則、減るなら巡回（cyclic_eq）。行番号で区切れない medium 用。
+- superset_medium_s125_grow_now.v（3,135PA / 50,130bit）: 行間の規則 = 今×9, 巡×2, 今×1（行11→12: 353→370）, 巡×7
+- small は完全な山形なので split11 と同一になる（structures/superset_allrelay_s125_split11.v を使う）
+配置: `STEP=4 TOOL=place_fixed_tbl.py CAND_RULE=grow_now SUPERSET=structures/superset_medium_s125_grow_now.v EBR=data/eblif_relay_medium PLACED=results/place_medium_grow ./run_noskip_superset.sh`

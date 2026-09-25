@@ -5,19 +5,25 @@
    cyclic : 巡回。前段の行を 0,s,2s,…(mod ns) と並べた列を先頭から d 個ずつ次段の行0,1,… に配る。
             s は ns と互いに素 → 列は前段の全行を一巡するので、届く回数の差は行ごとに1以内・届かない行ゼロ。
             d = ⌈今の規則の候補総数 / 次段幅⌉（全行同じ d。切り上げのぶん候補が今より 5〜10% 多い）
+   splitK : 行き先の行番号が K 以下は今の規則、K より FF 側は cyclic_eq（2026-09-25、例 split11）
    alt_now/alt_cyc : 行ごとに今の規則と cyclic_eq を交互に使う（2026-09-22）
    cyclic_eq : ★公平版（2026-09-17）。次段の行 r の候補数を今の規則のその行の数と完全に同じにし、
             つなぎ先だけ巡回で配る（列の先頭から |今の規則の行 r| 個ずつ）。MUX の大きさ・bit 数が今と一致。
             間隔 s は 1行あたり平均候補数 d̄=round(総数/次段幅) から ⌊ns/d̄⌋、ns と互いに素まで −1。
    使い方: from cand_rules import make_cand; make_cand(ns, nd, rule)
 """
-import math
+import math, re
 from place_greedy import gen_pattern
 
 def make_cand(ns, nd, rule="now", row=None):
     """row = 行き先の行番号。交互規則（alt_now / alt_cyc）のときだけ使う。
        alt_now : row が偶数 → 今の規則、奇数 → 巡回（本数そろえ版）
        alt_cyc : row が偶数 → 巡回、奇数 → 今の規則"""
+    m = re.match(r"^split(\d+)$", rule)
+    if m:            # ★2026-09-25 splitK: 行き先の行番号 <= K は今の規則、それより FF 側は巡回（cyclic_eq）
+        if row is None:
+            raise ValueError(f"{rule} には row（行き先の行番号）が要る")
+        return make_cand(ns, nd, "now" if row <= int(m.group(1)) else "cyclic_eq")
     if rule in ("alt_now", "alt_cyc"):
         if row is None:
             raise ValueError(f"{rule} には row（行き先の行番号）が要る")

@@ -72,3 +72,9 @@ RTL → eblif は `RTL_DIR=rtl_medium OUTDIR=results/eblif_medium python3 src/rt
 配置: `STEP=4 TOOL=place_fixed_tbl.py CAND_RULE=<規則> SUPERSET=structures/superset_dupdec_<規則>.v EBR=data/eblif_relay_dupdec PLACED=results/place_dupdec_<規則> ./run_noskip_superset.sh`
   列数1.25倍版（superset_dupdec_s125_*.v, 9/25）: [2,4,5,12,18,27,38,54,90,122,149,168,149,98,55,30,15,9] = 1,045PA / 16,003bit
     （複製なしの s125 は 996PA / 15,189bit → +4.9% / +5.4%）
+
+## 位置で規則を切り替えた版（2026-09-25、superset_allrelay_s125_split11.v）
+列数1.25倍・複製なし（996PA / 15,189bit、s125 の他版と同一）。候補表は CAND_RULE=split11:
+行き先の行番号 <=11（行10→行11 まで）は今の規則、行11→行12 以降（FF 側）は巡回（cyclic_eq）。
+狙い: 入力側は多くに配るセルの受け皿（万能列）を残し、FF 側は届く先の少ない列を無くす。
+配置: `STEP=4 TOOL=place_fixed_tbl.py CAND_RULE=split11 SUPERSET=structures/superset_allrelay_s125_split11.v ./run_noskip_superset.sh`

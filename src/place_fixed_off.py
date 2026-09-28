@@ -27,6 +27,8 @@
 
 使い方: python3 place_fixed_off.py <EBLIF> <CONE_V> [HOME_EBLIF]
 環境: ATIME(秒, 既定3600) CAND_RULE(既定now) OFFSET(既定0)
+★2026-09-28: 構造 .v の FLIPFLOP_NODE ff_c<段>_<i> から FF のある段を読み、段 D-1-OFFSET に FF が無ければ
+  「結果: INFEASIBLE(FF無し)」で止める（NFFSTAGES=1 の構造で OFFSET>=1 を使う誤りを防ぐ）。
 """
 import sys, math, os, re, json
 from collections import defaultdict
@@ -105,6 +107,11 @@ maxR = max(R.values())
 FFCOL = D - 1 - OFFSET                      # R=0 のセルが置かれる段（= FF が必要な段）
 if FFCOL < 0 or maxR + 1 + OFFSET > D:
     print(f"結果: INFEASIBLE(段不足) 構造D={D} OFFSET={OFFSET} では回路FF距離段{maxR+1}が入らない"); sys.exit()
+# ★2026-09-28 構造に FF がある段を .v から読み、FF段(D-1-OFFSET)に FF が無ければ弾く（物理的に成り立たないため）
+FF_ROWS = sorted({int(mm.group(1)) for mm in re.finditer(r'FLIPFLOP_NODE\s+ff_c(\d+)_\d+', gtxt)})
+if FFCOL not in FF_ROWS:
+    print(f"結果: INFEASIBLE(FF無し) 構造の FF は段{FF_ROWS}にしか無い。OFFSET={OFFSET} では段{FFCOL}に FF が要る")
+    sys.exit()
 col_of = {o: FFCOL - R[o] for o in cbo}
 for o in comb_po_cells(EB, cbo):            # 組合せPOを FF段へ
     col_of[o] = FFCOL

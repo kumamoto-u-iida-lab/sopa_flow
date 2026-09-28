@@ -90,3 +90,7 @@ gen_cone_ext.py の NFFSTAGES=3（行17・18・19 の全 PA 出力に FLIPFLOP_N
 構成メモリ 56,454bit（FF 最下行だけの版 50,130bit から +12.6%。FF帰還が全 IMUX に入るので imux が +6,264bit）。
 place_fixed_off.py（段固定＋OFFSET）で OFFSET=0/1/2 のどれでも物理的に正当（FF段 = 19/18/17）。
 配置: `STEP=4 TOOL=place_fixed_off.py OFFSET=<0|1|2> CAND_RULE=<規則> SUPERSET=structures/superset_medium_s125_ff3_<規則>.v PLACED=... ./run_noskip_superset.sh`
+
+## FF を下3行に置いた small 1.25倍版（2026-09-28、superset_allrelay_s125_ff3_{now,cyclic_eq,alt_cyc,split11}.v）
+NFFSTAGES=3（行15・16・17 の全 PA 出力に FF、53個）。列数は small 1.25倍（996PA）と同じ。15,961bit（FF最下行だけの 15,189bit から +5.1%）。
+回路ごとに OFFSET=0,1,2 を順に試すには run_off_sweep.sh を使う（place_fixed_off.py は FF の無い段へのずらしを弾く）。

@@ -85,7 +85,7 @@ RTL → eblif は `RTL_DIR=rtl_medium OUTDIR=results/eblif_medium python3 src/rt
 - small は完全な山形なので split11 と同一になる（structures/superset_allrelay_s125_split11.v を使う）
 配置: `STEP=4 TOOL=place_fixed_tbl.py CAND_RULE=grow_now SUPERSET=structures/superset_medium_s125_grow_now.v EBR=data/eblif_relay_medium PLACED=results/place_medium_grow ./run_noskip_superset.sh`
 
-## FF を下3行に置いた medium 1.25倍版（2026-09-28、superset_medium_s125_ff3_{now,cyclic_eq,alt_cyc}.v）
+## FF を下3行に置いた medium 1.25倍版（2026-09-28、superset_medium_s125_ff3_{now,cyclic_eq,alt_cyc,grow_now}.v）
 gen_cone_ext.py の NFFSTAGES=3（行17・18・19 の全 PA 出力に FLIPFLOP_NODE、72個）。列数は medium 1.25倍と同じ。
 構成メモリ 56,454bit（FF 最下行だけの版 50,130bit から +12.6%。FF帰還が全 IMUX に入るので imux が +6,264bit）。
 place_fixed_off.py（段固定＋OFFSET）で OFFSET=0/1/2 のどれでも物理的に正当（FF段 = 19/18/17）。

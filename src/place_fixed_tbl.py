@@ -141,7 +141,33 @@ _now = {col: gen_pattern(widths[col - 1], widths[col]) for col in range(1, D)}
 print(f"候補規則 CAND_RULE={CAND_RULE}: 候補 {sum(len(x) for c in cand for x in cand[c])} 本 (now {sum(len(x) for c in _now for x in _now[c])})"
       f"  段間imux選択bitの目安 {sum(2*_sel(len(x)) for c in cand for x in cand[c])} (now {sum(2*_sel(len(x)) for c in _now for x in _now[c])})", flush=True)
 m = cp_model.CpModel()
-row = {o: m.NewIntVar(0, widths[col_of[o]] - 1, '') for o in cbo}
+# ★2026-09-29 PRUNE=1: fanout f のセルは「次の行の f 列以上に届く列」にしか置けない、を変数の範囲として先に入れる。
+#   必ず成り立つ条件なので載る/載らないの答えは変わらない。探索の前に選択肢を減らすだけ。
+PRUNE = os.environ.get("PRUNE") == "1"
+_kids = defaultdict(set)
+for _c in logic:
+    _u = _c['o']
+    if _u not in col_of: continue
+    for _s in _c['srcs']:
+        if _s in cbo and col_of[_u] - col_of[_s] == 1: _kids[_s].add(_u)
+_reach = {}
+for _c in range(0, D - 1):
+    _r = [0] * widths[_c]
+    for _cs in cand[_c + 1]:
+        for _k in _cs: _r[_k] += 1
+    _reach[_c] = _r
+row = {}; _cut = 0; _tot = 0
+for o in cbo:
+    c = col_of[o]; w = widths[c]; f = len(_kids[o]); _tot += w
+    if PRUNE and f >= 2 and c < D - 1:
+        ok = [k for k in range(w) if _reach[c][k] >= f]
+        _cut += w - len(ok)
+        row[o] = m.NewIntVarFromDomain(cp_model.Domain.FromValues(ok), '') if ok else m.NewIntVar(0, 0, '')
+        if not ok: m.Add(row[o] != 0)   # 置ける列が無い = そのまま矛盾
+    else:
+        row[o] = m.NewIntVar(0, w - 1, '')
+if PRUNE:
+    print(f"PRUNE=1: fanout で外した選択肢 {_cut} / {_tot}（{_cut/_tot*100:.1f}%）  fanout>=2 のセル {sum(1 for o in cbo if len(_kids[o])>=2)} 個", flush=True)
 for col, cs in bycol.items():
     if len(cs) > 1:
         m.AddAllDifferent([row[o] for o in cs])

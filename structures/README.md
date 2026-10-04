@@ -94,3 +94,20 @@ place_fixed_off.py（段固定＋OFFSET）で OFFSET=0/1/2 のどれでも物理
 ## FF を下3行に置いた small 1.25倍版（2026-09-28、superset_allrelay_s125_ff3_{now,cyclic_eq,alt_cyc,split11}.v）
 NFFSTAGES=3（行15・16・17 の全 PA 出力に FF、53個）。列数は small 1.25倍（996PA）と同じ。15,961bit（FF最下行だけの 15,189bit から +5.1%）。
 回路ごとに OFFSET=0,1,2 を順に試すには run_off_sweep.sh を使う（place_fixed_off.py は FF の無い段へのずらしを弾く）。
+
+## 余りの割合をそろえた20段構造（2026-10-04、superset_mm20ff7_alt_cyc.v）
+総PA 1,050・20段・最終段7（FF 6個＋組合せ出力1）・交互（alt_cyc）。small 41回路が **41/41**（e4 1,560s が最遅）。
+幅の決め方は目的1つ:「合計1,050を固定し、各段の 幅÷必要数 の最小値を最大にする」。整数の水位合わせで一意に決まる
+（必要数から始め、比が最小の段に1個ずつ足す。必要0の段は1、最終段は7に固定）。
+必要数 = small 41回路を FF 側に揃えたときの各段の最大（20段に揃えたもの）。※ネットリスト由来。
+| ファイル | 列数(入力側->FF側) | PA | 構成メモリ |
+|---|---|---|---|
+| superset_mm20ff7_alt_cyc.v | [1,1,2,4,6,12,19,28,40,57,95,128,157,173,131,85,57,31,16,7] | 1,050 | 14,695 bit（IMUX 12,588 + PA 2,100 + FF 7） |
+再生成:
+```bash
+cd src && CAND_RULE=alt_cyc SKIP_SPECS=2:0 NEXT=0$(printf ',45%.0s' $(seq 19)) NEXTTAG=mm20ff7_alt_cyc \
+  python3 gen_cone_ext.py 7,16,31,57,85,131,173,157,128,95,57,40,28,19,12,6,4,2,1,1
+```
+比較: 倍々の規則で作った同じ 1,050PA・14,695bit の構造（1,2,3,4,7,10,17,27,43,68,110,135,135,135,136,112,56,28,14,7）は 38/41。
+面積用（構成メモリ込み、top=SOPA_CORE）: `python3 src/gen_conf_chain.py structures/superset_mm20ff7_alt_cyc.v area/rtl/sopa_conf/superset_mm20ff7_alt_cyc.v`
+配置: `STEP=4 TOOL=place_fixed_tbl.py CAND_RULE=alt_cyc SUPERSET=structures/superset_mm20ff7_alt_cyc.v ./run_noskip_superset.sh`

@@ -31,3 +31,6 @@ area/run_conf.log
 # medium RTL: 構文エラーで除外
 rtl_medium/alf.v
 rtl_medium/mogi.v
+
+# 行を緩めた配置の結果json
+src/place_span_*.json

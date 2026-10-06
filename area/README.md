@@ -18,7 +18,9 @@ cd area && JOBS=1 ./run_conf.sh |& tee run_conf.log     # ③ 1プロセス1構�
 | SoPA 全部中継 | SOPA_CORE | 11,083 | rtl/sopa_conf/superset_noskip.v |
 | ★SoPA 全部中継・交互(alt_cyc) 37/41 | SOPA_CORE | 11,083 | rtl/sopa_conf/superset_allrelay_alt_cyc.v（git 管理、9/23） |
 | ★SoPA 列数1.25倍・交互(alt_cyc) 41/41 | SOPA_CORE | 15,189 | rtl/sopa_conf/superset_allrelay_s125_alt_cyc.v（git 管理、9/23） |
-| ★SoPA 余りの割合をそろえた20段・交互(alt_cyc) 41/41 | SOPA_CORE | 14,695 | rtl/sopa_conf/superset_mm20ff7_alt_cyc.v（git 管理、10/4） |
+| ~~SoPA 余りの割合をそろえた20段・交互 41/41~~ ※16→7 が2倍超で規則違反（段18の行14・15が死んだPA）→ mm20r2 に置き換え | SOPA_CORE | 14,695 | rtl/sopa_conf/superset_mm20ff7_alt_cyc.v（10/4、使わない） |
+| ★SoPA 1,050PA 余りの割合をそろえた配分・隣2倍以内・交互 41/41（段固定のみ） | SOPA_CORE | 14,695 | rtl/sopa_conf/superset_mm20r2_alt_cyc.v（git 管理、10/6） |
+| ★SoPA 1,536PA 規則（FF側7から倍々＋入力側等比）・交互 38/41＋案B救済3 | SOPA_CORE | 22,741 | rtl/sopa_conf/superset_r1536_alt_cyc.v（git 管理、10/6） |
 | SoPA 全部中継・巡回(cyclic_eq) | SOPA_CORE | 11,083 | rtl/sopa_conf/superset_allrelay_cyclic_eq.v（★git 管理、9/17） |
 | IPGen 超集合 x11_y17_om19_pi45 | FPGA_CORE | 10,184 | rtl/ipgen_conf/superset/（EFPGA_CORE 一式 + FPGA_CORE_conf.v、git 管理） |
 
@@ -27,3 +29,11 @@ cd area && JOBS=1 ./run_conf.sh |& tee run_conf.log     # ③ 1プロセス1構�
 - 島（6x6 W32 fc32 = 846,225 μm²）は元から CONF_FF 込みなので測り直し不要
 - 9/1 の構成メモリ抜きの値: SoPA 379,783 / IPGen 676,763 μm²。CONF_FF 1個 ≈ 20.6 μm²（6月の島レポート）なので
   込みの見込みは SoPA ≈ 593k / IPGen ≈ 887k / 島 846k（推測）
+
+## 2026-10-06 追加: tcl/area_sopa_conf.tcl と run_sopa_conf_new.sh
+area_conf.tcl の kind=sopa_conf だけを抜き出し、`report_area -hierarchy` を足した版（合成条件は同一）。
+構成メモリ（CONF_TILE）と配線構造（FABRIC = cone）の面積を分けて読める。
+```bash
+cd area && JOBS=1 ./run_sopa_conf_new.sh |& tee run_sopa_conf_new.log   # mm20r2 / r1536 / s125_alt_cyc の3本
+```
+結果: result_sopa_conf_fast/<名前>.rep（Total cell area）、<名前>_hier.rep（内訳）。

@@ -111,3 +111,14 @@ cd src && CAND_RULE=alt_cyc SKIP_SPECS=2:0 NEXT=0$(printf ',45%.0s' $(seq 19)) N
 比較: 倍々の規則で作った同じ 1,050PA・14,695bit の構造（1,2,3,4,7,10,17,27,43,68,110,135,135,135,136,112,56,28,14,7）は 38/41。
 面積用（構成メモリ込み、top=SOPA_CORE）: `python3 src/gen_conf_chain.py structures/superset_mm20ff7_alt_cyc.v area/rtl/sopa_conf/superset_mm20ff7_alt_cyc.v`
 配置: `STEP=4 TOOL=place_fixed_tbl.py CAND_RULE=alt_cyc SUPERSET=structures/superset_mm20ff7_alt_cyc.v ./run_noskip_superset.sh`
+
+## 2026-10-06: 隣の段と2倍以内の規則を守った版
+今の規則（gen_pattern）は前段の行 k の届く先を ⌊2×次段幅÷k⌋ 本にするので、前段が次段の2倍を超えると
+後ろの行が次段のどこにもつながらない。superset_mm20ff7_alt_cyc.v は 16→7（2.29倍）で段18の行14・15が死んだPA → 使わない。
+| ファイル | 列数(入力側->FF側) | PA | 構成メモリ | small 41（交互） |
+|---|---|---|---|---|
+| superset_mm20r2_alt_cyc.v | [1,1,2,4,6,12,19,28,40,58,96,129,158,174,132,85,56,28,14,7] | 1,050 | 14,695 bit | 段固定 41/41 |
+| superset_r1536_alt_cyc.v | [1,2,2,4,6,10,15,24,38,61,95,151,238,448,224,112,56,28,14,7] | 1,536 | 22,741 bit | 段固定 38/41 ＋ 案B・子ごと 3/3 |
+mm20r2 = 合計1,050で「幅÷必要数の最小を最大化」＋隣2倍以内（必要数は small のネットリスト由来）。
+r1536 = ネットリスト不使用の規則: FF 側は最終段7から倍々（段数は式 floor(1.21·log2(最大遷移数225)−2.90)=6）、入力側は段0=1から等比、20段。
+再生成: `cd src && CAND_RULE=alt_cyc SKIP_SPECS=2:0 NEXT=0$(printf ',45%.0s' $(seq 19)) NEXTTAG=<tag> python3 gen_cone_ext.py <FF側→入力側の幅>`

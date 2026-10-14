@@ -1,0 +1,312 @@
+.model girl10
+.inputs clk rst x1 x2 x3 x4 x5 x6 x7
+.outputs pr_state[0] pr_state[1] pr_state[2]
+.names $false
+.names $true
+1
+.names $undef
+.subckt cell I_a=$auto$dfflibmap.cc:519:dfflibmap$540 I_b=pr_state[2] O_a=$abc$552$new_n33_
+.param MODE 00
+.subckt cell I_a=$abc$552$new_n29_ I_b=x6__pi5 O_a=$abc$552$new_n34_
+.param MODE 00
+.subckt cell I_a=$auto$dfflibmap.cc:519:dfflibmap$540 I_b=pr_state[1] O_a=$abc$552$new_n38_
+.param MODE 00
+.subckt cell I_a=$abc$552$new_n28_ I_b=$abc$552$new_n38_ O_a=$abc$552$new_n39_
+.param MODE 00
+.subckt cell I_a=pr_state[0] I_b=pr_state[2] O_a=$abc$552$new_n42_
+.param MODE 00
+.subckt cell I_a=$abc$552$new_n29_ I_b=$abc$552$new_n42_ O_a=$abc$552$new_n43_
+.param MODE 00
+.subckt cell I_a=x5__pi4 I_b=$abc$552$new_n43_ O_a=$abc$552$new_n44_
+.param MODE 00
+.subckt cell I_a=pr_state[0] I_b=$abc$552$new_n28_ O_a=$abc$552$new_n46_
+.param MODE 00
+.subckt cell I_a=$abc$552$new_n29___r1 I_b=$abc$552$new_n46_ O_a=$abc$552$new_n47_
+.param MODE 00
+.subckt cell I_a=pr_state[1] I_b=$abc$552$new_n46_ O_a=$abc$552$new_n51_
+.param MODE 00
+.subckt cell I_a=$abc$552$new_n55_ I_b=$abc$552$new_n57_ O_a=$abc$552$auto$rtlil.cc:2020:NotGate$539
+.param MODE 00
+.subckt cell I_a=x1__pi5 I_b=x4__pi5 O_a=$abc$552$new_n65_
+.param MODE 00
+.subckt cell I_a=$abc$552$new_n37___r1 I_b=$abc$552$new_n69_ O_a=$abc$552$new_n70_
+.param MODE 00
+.subckt cell I_a=$abc$552$new_n26___r1 I_b=$abc$552$new_n62_ O_a=$abc$552$new_n73_
+.param MODE 00
+.subckt cell I_a=$abc$552$new_n51_ I_b=$abc$552$new_n75_ O_a=$abc$552$new_n76_
+.param MODE 00
+.subckt cell I_a=$abc$552$new_n79_ I_b=$abc$552$new_n81_ O_a=$abc$552$new_n82_
+.param MODE 00
+.subckt cell I_a=$abc$552$new_n39___r1 I_b=x4__pi3 O_a=$abc$552$new_n40_
+.param MODE 01
+.subckt cell I_a=$abc$552$new_n47_ I_b=x6__pi3 O_a=$abc$552$new_n49_
+.param MODE 01
+.subckt cell I_a=$abc$552$new_n54_ I_b=$abc$552$new_n49_ O_a=$abc$552$new_n55_
+.param MODE 01
+.subckt cell I_a=$abc$552$new_n37_ I_b=$abc$552$new_n44_ O_a=$abc$552$new_n56_
+.param MODE 01
+.subckt cell I_a=$abc$552$new_n56_ I_b=$abc$552$new_n40_ O_a=$abc$552$new_n57_
+.param MODE 01
+.subckt cell I_a=$abc$552$new_n68_ I_b=$abc$552$new_n47_ O_a=$abc$552$new_n69_
+.param MODE 01
+.subckt cell I_a=x2__pi4 I_b=x3__pi4 O_a=$abc$552$new_n75_
+.param MODE 01
+.subckt cell I_a=$abc$552$new_n82_ I_b=$abc$552$new_n76_ O_a=$abc$552$new_n83_
+.param MODE 01
+.subckt cell I_a=$abc$552$new_n33_ I_b=$abc$552$new_n34_ O_a=$abc$552$new_n37_
+.param MODE 10
+.subckt cell I_a=$abc$552$new_n26_ I_b=$abc$552$new_n51_ O_a=$abc$552$new_n54_
+.param MODE 10
+.subckt cell I_a=x1__pi2 I_b=$abc$552$new_n62_ O_a=$abc$552$new_n64_
+.param MODE 10
+.subckt cell I_a=$abc$552$new_n39_ I_b=$abc$552$new_n65_ O_a=$abc$552$new_n68_
+.param MODE 10
+.subckt cell I_a=$abc$552$new_n64_ I_b=$abc$552$new_n70_ O_a=$abc$552$nx_state[1]
+.param MODE 10
+.subckt cell I_a=$abc$552$new_n43_ I_b=x5__pi4 O_a=$abc$552$new_n60_
+.param MODE 11
+.subckt cell I_a=$abc$552$new_n60_ I_b=$abc$552$new_n51_ O_a=$abc$552$new_n62_
+.param MODE 11
+.subckt cell I_a=$abc$552$new_n39_ I_b=$abc$552$new_n65_ O_a=$abc$552$new_n79_
+.param MODE 11
+.subckt cell I_a=$abc$552$new_n33_ I_b=$abc$552$new_n34_ O_a=$abc$552$new_n81_
+.param MODE 11
+.subckt cell I_a=$abc$552$new_n83_ I_b=$abc$552$new_n73_ O_a=$abc$552$nx_state[2]
+.param MODE 11
+.subckt cell I_a=rst I_b=$true O_a=$abc$552$auto$rtlil.cc:2020:NotGate$551
+.param MODE 10
+.subckt cell I_a=clk I_b=$true O_a=$abc$552$auto$rtlil.cc:2020:NotGate$549
+.param MODE 10
+.subckt cell I_a=$auto$dfflibmap.cc:519:dfflibmap$540 I_b=$true O_a=pr_state[0]
+.param MODE 10
+.subckt cell I_a=x1__pi4 I_b=$true O_a=$abc$552$new_n26_
+.param MODE 10
+.subckt cell I_a=pr_state[2] I_b=$true O_a=$abc$552$new_n28_
+.param MODE 10
+.subckt cell I_a=pr_state[1] I_b=$true O_a=$abc$552$new_n29_
+.param MODE 10
+.subckt cell I_a=clk I_b=$true O_a=$abc$552$auto$rtlil.cc:2020:NotGate$545
+.param MODE 10
+.subckt cell I_a=clk I_b=$true O_a=$abc$552$auto$rtlil.cc:2020:NotGate$537
+.param MODE 10
+.subckt cell I_a=rst I_b=$true O_a=$abc$552$auto$rtlil.cc:2020:NotGate$543
+.param MODE 10
+.subckt cell I_a=rst I_b=$true O_a=$abc$552$auto$rtlil.cc:2020:NotGate$547
+.param MODE 10
+.subckt DFF_PN0 C=$abc$552$auto$rtlil.cc:2020:NotGate$537 D=$abc$552$auto$rtlil.cc:2020:NotGate$539 Q=$auto$dfflibmap.cc:519:dfflibmap$540 R=$abc$552$auto$rtlil.cc:2020:NotGate$543
+.subckt DFF_PN0 C=$abc$552$auto$rtlil.cc:2020:NotGate$545 D=$abc$552$nx_state[1] Q=pr_state[1] R=$abc$552$auto$rtlil.cc:2020:NotGate$547
+.subckt DFF_PN0 C=$abc$552$auto$rtlil.cc:2020:NotGate$549 D=$abc$552$nx_state[2] Q=pr_state[2] R=$abc$552$auto$rtlil.cc:2020:NotGate$551
+.conn $abc$552$auto$rtlil.cc:2020:NotGate$539 DummyBuf0
+.conn $abc$552$nx_state[1] DummyBuf1
+.conn $abc$552$nx_state[2] DummyBuf2
+.subckt cell I_a=$abc$552$new_n29_ I_b=$true O_a=$abc$552$new_n29___r1
+.param MODE 00
+.subckt cell I_a=$abc$552$new_n37_ I_b=$true O_a=$abc$552$new_n37___r1
+.param MODE 00
+.subckt cell I_a=$abc$552$new_n26_ I_b=$true O_a=$abc$552$new_n26___r1
+.param MODE 00
+.subckt cell I_a=$abc$552$new_n39_ I_b=$true O_a=$abc$552$new_n39___r1
+.param MODE 00
+.subckt cell I_a=x1 I_b=$true O_a=x1__pi19
+.param MODE 00
+.subckt cell I_a=x1__pi19 I_b=$true O_a=x1__pi18
+.param MODE 00
+.subckt cell I_a=x1__pi18 I_b=$true O_a=x1__pi17
+.param MODE 00
+.subckt cell I_a=x1__pi17 I_b=$true O_a=x1__pi16
+.param MODE 00
+.subckt cell I_a=x1__pi16 I_b=$true O_a=x1__pi15
+.param MODE 00
+.subckt cell I_a=x1__pi15 I_b=$true O_a=x1__pi14
+.param MODE 00
+.subckt cell I_a=x1__pi14 I_b=$true O_a=x1__pi13
+.param MODE 00
+.subckt cell I_a=x1__pi13 I_b=$true O_a=x1__pi12
+.param MODE 00
+.subckt cell I_a=x1__pi12 I_b=$true O_a=x1__pi11
+.param MODE 00
+.subckt cell I_a=x1__pi11 I_b=$true O_a=x1__pi10
+.param MODE 00
+.subckt cell I_a=x1__pi10 I_b=$true O_a=x1__pi9
+.param MODE 00
+.subckt cell I_a=x1__pi9 I_b=$true O_a=x1__pi8
+.param MODE 00
+.subckt cell I_a=x1__pi8 I_b=$true O_a=x1__pi7
+.param MODE 00
+.subckt cell I_a=x1__pi7 I_b=$true O_a=x1__pi6
+.param MODE 00
+.subckt cell I_a=x1__pi6 I_b=$true O_a=x1__pi5
+.param MODE 00
+.subckt cell I_a=x1__pi5 I_b=$true O_a=x1__pi4
+.param MODE 00
+.subckt cell I_a=x1__pi4 I_b=$true O_a=x1__pi3
+.param MODE 00
+.subckt cell I_a=x1__pi3 I_b=$true O_a=x1__pi2
+.param MODE 00
+.subckt cell I_a=x2 I_b=$true O_a=x2__pi19
+.param MODE 00
+.subckt cell I_a=x2__pi19 I_b=$true O_a=x2__pi18
+.param MODE 00
+.subckt cell I_a=x2__pi18 I_b=$true O_a=x2__pi17
+.param MODE 00
+.subckt cell I_a=x2__pi17 I_b=$true O_a=x2__pi16
+.param MODE 00
+.subckt cell I_a=x2__pi16 I_b=$true O_a=x2__pi15
+.param MODE 00
+.subckt cell I_a=x2__pi15 I_b=$true O_a=x2__pi14
+.param MODE 00
+.subckt cell I_a=x2__pi14 I_b=$true O_a=x2__pi13
+.param MODE 00
+.subckt cell I_a=x2__pi13 I_b=$true O_a=x2__pi12
+.param MODE 00
+.subckt cell I_a=x2__pi12 I_b=$true O_a=x2__pi11
+.param MODE 00
+.subckt cell I_a=x2__pi11 I_b=$true O_a=x2__pi10
+.param MODE 00
+.subckt cell I_a=x2__pi10 I_b=$true O_a=x2__pi9
+.param MODE 00
+.subckt cell I_a=x2__pi9 I_b=$true O_a=x2__pi8
+.param MODE 00
+.subckt cell I_a=x2__pi8 I_b=$true O_a=x2__pi7
+.param MODE 00
+.subckt cell I_a=x2__pi7 I_b=$true O_a=x2__pi6
+.param MODE 00
+.subckt cell I_a=x2__pi6 I_b=$true O_a=x2__pi5
+.param MODE 00
+.subckt cell I_a=x2__pi5 I_b=$true O_a=x2__pi4
+.param MODE 00
+.subckt cell I_a=x3 I_b=$true O_a=x3__pi19
+.param MODE 00
+.subckt cell I_a=x3__pi19 I_b=$true O_a=x3__pi18
+.param MODE 00
+.subckt cell I_a=x3__pi18 I_b=$true O_a=x3__pi17
+.param MODE 00
+.subckt cell I_a=x3__pi17 I_b=$true O_a=x3__pi16
+.param MODE 00
+.subckt cell I_a=x3__pi16 I_b=$true O_a=x3__pi15
+.param MODE 00
+.subckt cell I_a=x3__pi15 I_b=$true O_a=x3__pi14
+.param MODE 00
+.subckt cell I_a=x3__pi14 I_b=$true O_a=x3__pi13
+.param MODE 00
+.subckt cell I_a=x3__pi13 I_b=$true O_a=x3__pi12
+.param MODE 00
+.subckt cell I_a=x3__pi12 I_b=$true O_a=x3__pi11
+.param MODE 00
+.subckt cell I_a=x3__pi11 I_b=$true O_a=x3__pi10
+.param MODE 00
+.subckt cell I_a=x3__pi10 I_b=$true O_a=x3__pi9
+.param MODE 00
+.subckt cell I_a=x3__pi9 I_b=$true O_a=x3__pi8
+.param MODE 00
+.subckt cell I_a=x3__pi8 I_b=$true O_a=x3__pi7
+.param MODE 00
+.subckt cell I_a=x3__pi7 I_b=$true O_a=x3__pi6
+.param MODE 00
+.subckt cell I_a=x3__pi6 I_b=$true O_a=x3__pi5
+.param MODE 00
+.subckt cell I_a=x3__pi5 I_b=$true O_a=x3__pi4
+.param MODE 00
+.subckt cell I_a=x4 I_b=$true O_a=x4__pi19
+.param MODE 00
+.subckt cell I_a=x4__pi19 I_b=$true O_a=x4__pi18
+.param MODE 00
+.subckt cell I_a=x4__pi18 I_b=$true O_a=x4__pi17
+.param MODE 00
+.subckt cell I_a=x4__pi17 I_b=$true O_a=x4__pi16
+.param MODE 00
+.subckt cell I_a=x4__pi16 I_b=$true O_a=x4__pi15
+.param MODE 00
+.subckt cell I_a=x4__pi15 I_b=$true O_a=x4__pi14
+.param MODE 00
+.subckt cell I_a=x4__pi14 I_b=$true O_a=x4__pi13
+.param MODE 00
+.subckt cell I_a=x4__pi13 I_b=$true O_a=x4__pi12
+.param MODE 00
+.subckt cell I_a=x4__pi12 I_b=$true O_a=x4__pi11
+.param MODE 00
+.subckt cell I_a=x4__pi11 I_b=$true O_a=x4__pi10
+.param MODE 00
+.subckt cell I_a=x4__pi10 I_b=$true O_a=x4__pi9
+.param MODE 00
+.subckt cell I_a=x4__pi9 I_b=$true O_a=x4__pi8
+.param MODE 00
+.subckt cell I_a=x4__pi8 I_b=$true O_a=x4__pi7
+.param MODE 00
+.subckt cell I_a=x4__pi7 I_b=$true O_a=x4__pi6
+.param MODE 00
+.subckt cell I_a=x4__pi6 I_b=$true O_a=x4__pi5
+.param MODE 00
+.subckt cell I_a=x4__pi5 I_b=$true O_a=x4__pi4
+.param MODE 00
+.subckt cell I_a=x4__pi4 I_b=$true O_a=x4__pi3
+.param MODE 00
+.subckt cell I_a=x5 I_b=$true O_a=x5__pi19
+.param MODE 00
+.subckt cell I_a=x5__pi19 I_b=$true O_a=x5__pi18
+.param MODE 00
+.subckt cell I_a=x5__pi18 I_b=$true O_a=x5__pi17
+.param MODE 00
+.subckt cell I_a=x5__pi17 I_b=$true O_a=x5__pi16
+.param MODE 00
+.subckt cell I_a=x5__pi16 I_b=$true O_a=x5__pi15
+.param MODE 00
+.subckt cell I_a=x5__pi15 I_b=$true O_a=x5__pi14
+.param MODE 00
+.subckt cell I_a=x5__pi14 I_b=$true O_a=x5__pi13
+.param MODE 00
+.subckt cell I_a=x5__pi13 I_b=$true O_a=x5__pi12
+.param MODE 00
+.subckt cell I_a=x5__pi12 I_b=$true O_a=x5__pi11
+.param MODE 00
+.subckt cell I_a=x5__pi11 I_b=$true O_a=x5__pi10
+.param MODE 00
+.subckt cell I_a=x5__pi10 I_b=$true O_a=x5__pi9
+.param MODE 00
+.subckt cell I_a=x5__pi9 I_b=$true O_a=x5__pi8
+.param MODE 00
+.subckt cell I_a=x5__pi8 I_b=$true O_a=x5__pi7
+.param MODE 00
+.subckt cell I_a=x5__pi7 I_b=$true O_a=x5__pi6
+.param MODE 00
+.subckt cell I_a=x5__pi6 I_b=$true O_a=x5__pi5
+.param MODE 00
+.subckt cell I_a=x5__pi5 I_b=$true O_a=x5__pi4
+.param MODE 00
+.subckt cell I_a=x6 I_b=$true O_a=x6__pi19
+.param MODE 00
+.subckt cell I_a=x6__pi19 I_b=$true O_a=x6__pi18
+.param MODE 00
+.subckt cell I_a=x6__pi18 I_b=$true O_a=x6__pi17
+.param MODE 00
+.subckt cell I_a=x6__pi17 I_b=$true O_a=x6__pi16
+.param MODE 00
+.subckt cell I_a=x6__pi16 I_b=$true O_a=x6__pi15
+.param MODE 00
+.subckt cell I_a=x6__pi15 I_b=$true O_a=x6__pi14
+.param MODE 00
+.subckt cell I_a=x6__pi14 I_b=$true O_a=x6__pi13
+.param MODE 00
+.subckt cell I_a=x6__pi13 I_b=$true O_a=x6__pi12
+.param MODE 00
+.subckt cell I_a=x6__pi12 I_b=$true O_a=x6__pi11
+.param MODE 00
+.subckt cell I_a=x6__pi11 I_b=$true O_a=x6__pi10
+.param MODE 00
+.subckt cell I_a=x6__pi10 I_b=$true O_a=x6__pi9
+.param MODE 00
+.subckt cell I_a=x6__pi9 I_b=$true O_a=x6__pi8
+.param MODE 00
+.subckt cell I_a=x6__pi8 I_b=$true O_a=x6__pi7
+.param MODE 00
+.subckt cell I_a=x6__pi7 I_b=$true O_a=x6__pi6
+.param MODE 00
+.subckt cell I_a=x6__pi6 I_b=$true O_a=x6__pi5
+.param MODE 00
+.subckt cell I_a=x6__pi5 I_b=$true O_a=x6__pi4
+.param MODE 00
+.subckt cell I_a=x6__pi4 I_b=$true O_a=x6__pi3
+.param MODE 00
+.end
+
+

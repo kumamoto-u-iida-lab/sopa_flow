@@ -87,5 +87,15 @@ for c in logic:
         for p in c['srcs']:
             if p in pis and D - 1 - H[c['o']] >= 1: pi_at[H[c['o']]].add(p)
 err += [f"外部入力枠超過 行{h}: {len(p)}>{next_ext[D-1-h]}" for h, p in pi_at.items() if len(p) > next_ext[D - 1 - h]]
+# ★2026-10-14 入れ子（ext_nest.py）: 先頭 n 本だけを配る構造で、json の PI→EXT 割り当てが本当に届くか
+import ext_nest
+_pr = defaultdict(set)
+for h, ps in pi_at.items():
+    for p in ps: _pr[p].add(h)
+if 'ext' in J and J['ext'] is not None:
+    err += ext_nest.verify(_pr, D, next_ext, J['ext'])
+elif len({next_ext[c] for c in range(1, D)}) > 1:
+    _b = ext_nest.check(_pr, D, next_ext)
+    err += ["json に EXT 割り当てが無い"] + ([f"入れ子違反 枠{_b[0]}本以下の行で PI {_b[1]}本"] if _b else [])
 print(f"検算: 辺の行差 {dict(ngap)} / 中継 {len(J['ft'])} / 上げたセル {sum(1 for o in cbo if H[o] != R[o])}"
       f" / 誤り {len(err)}" + ("".join("\n  " + x for x in err[:10])))

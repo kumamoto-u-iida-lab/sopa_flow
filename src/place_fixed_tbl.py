@@ -111,6 +111,17 @@ ext_over = [(c, len(pis), next_ext[c]) for c, pis in pi_at.items()
 if ext_over:
     print(f"結果: INFEASIBLE(外部入力枠不足) 超過(段,相異なるPI需要,枠)={ext_over}")
     sys.exit()
+# ★2026-10-14 入れ子の判定（src/ext_nest.py）: 構造は段cに EXT[0..next_ext[c]-1] の先頭だけを配る。
+#   PI→EXT線の割り当ては回路で1通りなので、枠が k 以下の段で使う PI の和集合が k 本以下であること。全段同じ枠なら上と同じ判定。
+import ext_nest
+pi_rows = defaultdict(set)
+for c_, ps_ in pi_at.items():
+    for p_ in ps_: pi_rows[p_].add(D - 1 - c_)
+_bad = ext_nest.check(pi_rows, D, next_ext)
+if _bad:
+    print(f"結果: INFEASIBLE(外部入力の入れ子) 枠{_bad[0]}本以下の行で使うPIが{_bad[1]}本")
+    sys.exit()
+ext_of = ext_nest.assign(pi_rows, D, next_ext)
 
 # ---- skip需要(静的) ----
 skipdemand = defaultdict(int)
@@ -189,6 +200,6 @@ st = sv.Solve(m)
 print(f"結果: {sv.StatusName(st)} ({sv.WallTime():.0f}s)  gap1={len(edges1)} skip={nskip}"
       f"  外部入力需要(段:相異PI)={ {c: len(p) for c, p in sorted(pi_at.items())} }", flush=True)
 if sv.StatusName(st) in ('FEASIBLE', 'OPTIMAL'):
-    json.dump({'col': col_of, 'row': {o: sv.Value(row[o]) for o in cbo}},
+    json.dump({'col': col_of, 'row': {o: sv.Value(row[o]) for o in cbo}, 'ext': ext_of},
               open(f'place_fixed_tbl_{CKT}.json', 'w'), ensure_ascii=False)
     print(f"  保存: place_fixed_tbl_{CKT}.json")

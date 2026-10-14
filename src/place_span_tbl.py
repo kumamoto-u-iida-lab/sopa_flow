@@ -233,6 +233,35 @@ for c in logic:
 for h in range(D):
     vs = [v for (p, hh), v in used.items() if hh == h]
     if vs: m.Add(sum(vs) <= next_ext[D - 1 - h])
+# ★2026-10-14 入れ子（src/ext_nest.py）: 構造は行hに EXT の先頭 next_ext 本だけを配る。
+#   PI→EXT線は回路で1通りなので、枠が k 本以下の行で使う PI の和集合が k 本以下（k = 枠の各値）。
+#   全段同じ枠なら上の行ごとの制約と同じなので足さない。
+import ext_nest
+_levels = sorted({next_ext[c] for c in range(1, D)})
+if len(_levels) > 1:
+    _pis = sorted({p for (p, hh) in used})
+    # 配置前の判定: 行を上げても必ず枠k以下の行に残る PI（読むセルの行の候補が全部 枠k以下）だけで数える
+    _forced = defaultdict(set)
+    for c in logic:
+        u = c['o']
+        if u not in cbo: continue
+        ts = [ext_nest.tap(h, D, next_ext) for h in dom[u]]
+        if any(t is None for t in ts): continue
+        for p in c['srcs']:
+            if p in PI: _forced[max(ts)].add(p)
+    for k in _levels:
+        need = set().union(*[v for kk, v in _forced.items() if kk <= k])
+        if len(need) > k:
+            print(f"結果: INFEASIBLE(外部入力の入れ子・行を上げても) 枠{k}本以下の行で使うPIが{len(need)}本"); sys.exit()
+    for k in _levels[:-1]:
+        lv = []
+        for p in _pis:
+            vs = [v for (pp, hh), v in used.items() if pp == p and ext_nest.tap(hh, D, next_ext) <= k]
+            if not vs: continue
+            z = m.NewBoolVar('')
+            for v in vs: m.AddImplication(v, z)
+            lv.append(z)
+        if len(lv) > k: m.Add(sum(lv) <= k)
 
 sv = cp_model.CpSolver()
 sv.parameters.max_time_in_seconds = int(os.environ.get("ATIME", "600"))
@@ -256,7 +285,14 @@ if name in ("FEASIBLE", "OPTIMAL"):
             if hy == hu + 1 and ky in cand[hu][ku]: via.append([s_, u_, OFF[hy] + ky]); break
     nup = sum(1 for o in cbo if pos[o][0] != h0[o])
     extra = f"  上げたセル {nup} / 中継 {len(ft)}"
+    _pr = defaultdict(set)                             # PI → 使う行（解いた配置で）→ EXT 線の割り当て
+    for c in logic:
+        if c['o'] in cbo:
+            for p in c['srcs']:
+                if p in PI: _pr[p].add(pos[c['o']][0])
+    ext_of = ext_nest.assign(_pr, D, next_ext)
+    if ext_of is None: extra += "  ★外部入力の割り当て失敗（制約の誤り）"
     json.dump({'h': {o: pos[o][0] for o in cbo}, 'slot': {o: OFF[pos[o][0]] + pos[o][1] for o in cbo},
-               'MODE': MODE, 'FT': FT, 'ft': ft, 'via': via},
+               'MODE': MODE, 'FT': FT, 'ft': ft, 'via': via, 'ext': ext_of},
               open(f'place_span_{MODE}_{FT}_{CKT}.json', 'w'), ensure_ascii=False)
 print(f"結果: {name} ({sv.WallTime():.0f}s){extra}", flush=True)

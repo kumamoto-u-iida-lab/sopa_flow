@@ -5,7 +5,7 @@
 set -u
 cd "$(dirname "$0")"; ROOT=$(pwd)
 JOBS="${JOBS:-1}"
-TARGETS="${TARGETS:-superset_mm20r2_alt_cyc superset_r1536_alt_cyc superset_r1536_alt_cyc_ext45n superset_allrelay_s125_alt_cyc}"
+TARGETS="${TARGETS:-superset_mm20r2_alt_cyc superset_r1536_alt_cyc superset_r1536_alt_cyc_ext45n superset_r1536pi_alt_cyc superset_allrelay_s125_alt_cyc}"
 mkdir -p logs run alib result_sopa_conf_fast
 run_one() {
   local ckt="$1" d="run/sopa_conf_$1"; mkdir -p "$d"

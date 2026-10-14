@@ -22,6 +22,7 @@ cd area && JOBS=1 ./run_conf.sh |& tee run_conf.log     # ③ 1プロセス1構�
 | ★SoPA 1,050PA 余りの割合をそろえた配分・隣2倍以内・交互 41/41（段固定のみ） | SOPA_CORE | 14,695 | rtl/sopa_conf/superset_mm20r2_alt_cyc.v（git 管理、10/6） |
 | ★SoPA 1,536PA 規則（FF側7から倍々＋入力側等比）・交互 38/41＋案B救済3 | SOPA_CORE | 22,741 | rtl/sopa_conf/superset_r1536_alt_cyc.v（git 管理、10/6） |
 | ★SoPA 1,536PA 外部入力を FF 側ほど減らした入れ子（45/36/24/12本）・交互 38/41 | SOPA_CORE | 21,065 | rtl/sopa_conf/superset_r1536_alt_cyc_ext45n.v（git 管理、10/14） |
+| ★SoPA 1,536PA PI ノード（段0=EXT 45本を1対1直結の45列、段1以降の IMUX に EXT 無し）・交互 結果待ち | SOPA_CORE | 17,975 | rtl/sopa_conf/superset_r1536pi_alt_cyc.v（git 管理、10/14） |
 | SoPA 全部中継・巡回(cyclic_eq) | SOPA_CORE | 11,083 | rtl/sopa_conf/superset_allrelay_cyclic_eq.v（★git 管理、9/17） |
 | IPGen 超集合 x11_y17_om19_pi45 | FPGA_CORE | 10,184 | rtl/ipgen_conf/superset/（EFPGA_CORE 一式 + FPGA_CORE_conf.v、git 管理） |
 

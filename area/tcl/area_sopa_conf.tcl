@@ -16,6 +16,7 @@
 # ■ 対象（N = 構成メモリ bit 数）
 #   superset_mm20r2_alt_cyc   1,050PA / 20段 / N=14,695   small 41/41（段固定のみ）
 #   superset_r1536_alt_cyc    1,536PA / 20段 / N=22,741   small 38/41（段固定）+ 3（案B・子ごと）
+#   superset_r1536_alt_cyc_ext45n 1,536PA / 20段 / N=21,065   外部入力を FF 側ほど減らした入れ子（45/36/24/12本）。small 38/41
 #   superset_allrelay_s125_alt_cyc  996PA / 18段 / N=15,189   比較用（9/23 から git 管理）
 #
 # ■ 使い方（taurus2。ログインシェルは tcsh なので `VAR=値 cmd` は通らない）

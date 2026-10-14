@@ -9,6 +9,9 @@
      NEXT   … 段別外部入力数(入力側->FF側の順, カンマ区切り, 長さD)。既定=全0。
               例) NEXT=7,7,5,4,3,2,1,0,0,0
      NEXTTAG… 出力ファイル名の接尾辞(uni/tap等)。既定=""。
+     TOPEXT … ★2026-10-14 1 にすると段0(入力側)を外部ピン I でなく外部入力バス EXT[0..w0-1] に1対1で直結する:
+              PA i の I_A=EXT[i], I_B=1'b1（MODE 00 で出力=EXT[i]、PI ノード）。IMUX・選択ビットは無し。
+              どの PI をどの EXT 線に流すかは回路ごとに自由（PI ノード方式 r1536pi 用）。既定 0 = 従来どおり I を直受け。
    出力: cone_spindle_<a-b-...>[_<NEXTTAG>].v / .png"""
 import sys, math, os
 try:
@@ -49,6 +52,10 @@ else:
     next_ext = [0] * D
 NEXT_MAX = max(next_ext) if next_ext else 0
 NEXTTAG = os.environ.get("NEXTTAG", "")
+TOPEXT = os.environ.get("TOPEXT", "0") == "1"
+if TOPEXT:
+    assert NEXT_MAX <= widths[0], "TOPEXT=1 では EXT バス幅 = 段0 の列数（各段の NEXT はそれ以下）"
+    NEXT_MAX = widths[0]
 
 TAG = "spindle_" + "-".join(map(str, ff_to_in)) + (("_" + NEXTTAG) if NEXTTAG else "")
 SD = os.path.dirname(os.path.abspath(__file__))
@@ -179,7 +186,7 @@ def gen_verilog():
     L.append("module cone (")
     L.append("    input  wire CLK,")
     L.append("    input  wire PAE_RST_N,")
-    if Wmax:                                         # width[0]=0(段0が空)ならIポート省略
+    if Wmax and not TOPEXT:                          # width[0]=0(段0が空)ならIポート省略
         L.append(f"    input  wire [{2*Wmax-1}:0] I,")
     if NEXT_MAX:
         L.append(f"    input  wire [{NEXT_MAX-1}:0] EXT,")
@@ -201,10 +208,16 @@ def gen_verilog():
         L.append("    wire " + ", ".join(ffn[j:j+12]) + ";")
     L.append("")
 
-    L.append(f"    // ===== 段0 (入力側, w={Wmax}) : PA が外部入力 I を直受け =====")
-    for i in range(Wmax):
-        L.append(f"    PA pa_c0_{i} (.PA_I_A(I[{2*i}]), .PA_I_B(I[{2*i+1}]), "
-                 f".PA_O_A({owire(0,i)}), .PROG_DATA(CONFIG_DATA[{pa_cfg[(0,i)]} +: 2]));")
+    if TOPEXT:
+        L.append(f"    // ===== 段0 (入力側, w={Wmax}) : PI ノード。PA i が EXT[i] を直受け（I_B=1, MODE 00 で出力=EXT[i]） =====")
+        for i in range(Wmax):
+            L.append(f"    PA pa_c0_{i} (.PA_I_A(EXT[{i}]), .PA_I_B(1'b1), "
+                     f".PA_O_A({owire(0,i)}), .PROG_DATA(CONFIG_DATA[{pa_cfg[(0,i)]} +: 2]));")
+    else:
+        L.append(f"    // ===== 段0 (入力側, w={Wmax}) : PA が外部入力 I を直受け =====")
+        for i in range(Wmax):
+            L.append(f"    PA pa_c0_{i} (.PA_I_A(I[{2*i}]), .PA_I_B(I[{2*i+1}]), "
+                     f".PA_O_A({owire(0,i)}), .PROG_DATA(CONFIG_DATA[{pa_cfg[(0,i)]} +: 2]));")
     L.append("")
 
     for c in range(1, D):

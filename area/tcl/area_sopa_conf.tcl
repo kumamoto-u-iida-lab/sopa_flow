@@ -18,6 +18,7 @@
 #   superset_r1536_alt_cyc    1,536PA / 20段 / N=22,741   small 38/41（段固定）+ 3（案B・子ごと）
 #   superset_r1536_alt_cyc_ext45n 1,536PA / 20段 / N=21,065   外部入力を FF 側ほど減らした入れ子（45/36/24/12本）。small 38/41
 #   superset_r1536pi_alt_cyc      1,536PA / 20段 / N=17,975   外部入力は段0（45列）に EXT を1対1直結した PI ノードだけ、段1以降の IMUX に EXT 無し
+#   superset_r1536pi_ff7_alt_cyc  1,536PA / 20段 / N=17,699   r1536pi の FF 側を 28/14/7 列（隣2倍以内）にした版。small 40/41（e4 未決着）
 #   superset_allrelay_s125_alt_cyc  996PA / 18段 / N=15,189   比較用（9/23 から git 管理）
 #
 # ■ 使い方（taurus2。ログインシェルは tcsh なので `VAR=値 cmd` は通らない）

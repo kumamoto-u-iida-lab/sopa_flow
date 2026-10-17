@@ -40,3 +40,20 @@ area_conf.tcl の kind=sopa_conf だけを抜き出し、`report_area -hierarchy
 cd area && JOBS=1 ./run_sopa_conf_new.sh |& tee run_sopa_conf_new.log   # mm20r2 / r1536 / s125_alt_cyc の3本
 ```
 結果: result_sopa_conf_fast/<名前>.rep（Total cell area）、<名前>_hier.rep（内訳）。
+
+## 2026-10-17 追加: ff7 の作り方のまま大きさを振った7構造（superset_pi_ff7_s*_alt_cyc）
+包絡線（PI ノード込み41回路の行ごとの最大、計1,216PA）× 倍率。行0(FF)=7・最上段=45 固定、他は ⌈包絡線×倍率⌉、入力側の行 ≤ 2×FF側の隣。
+1.263倍は ff7（superset_r1536pi_ff7_alt_cyc、測定済みなら不要）。配置は ../run_sweep_ff7.sh（iidalab）。
+| 名前 | 倍率 | PA | bit |
+|---|---|---|---|
+| superset_pi_ff7_s100_alt_cyc | 1.00 | 1,218 | 13,547 |
+| superset_pi_ff7_s105_alt_cyc | 1.05 | 1,288 | 14,489 |
+| superset_pi_ff7_s110_alt_cyc | 1.10 | 1,345 | 15,239 |
+| superset_pi_ff7_s115_alt_cyc | 1.15 | 1,402 | 15,991 |
+| superset_pi_ff7_s120_alt_cyc | 1.20 | 1,456 | 16,645 |
+| （ff7 superset_r1536pi_ff7_alt_cyc） | 1.263 | 1,536 | 17,699 |
+| superset_pi_ff7_s135_alt_cyc | 1.35 | 1,626 | 18,839 |
+| superset_pi_ff7_s150_alt_cyc | 1.50 | 1,784 | 20,831 |
+```bash
+cd area && JOBS=1 TARGETS="superset_pi_ff7_s100_alt_cyc superset_pi_ff7_s105_alt_cyc superset_pi_ff7_s110_alt_cyc superset_pi_ff7_s115_alt_cyc superset_pi_ff7_s120_alt_cyc superset_pi_ff7_s135_alt_cyc superset_pi_ff7_s150_alt_cyc" ./run_sopa_conf_new.sh |& tee run_sweep_ff7_area.log
+```

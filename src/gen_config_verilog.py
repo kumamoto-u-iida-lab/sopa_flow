@@ -53,6 +53,12 @@ widths = [int(x) for x in re.search(r'widths\([^)]*\)=\s*\[([0-9,\s]*)\]', gtxt)
 D = len(widths); Wmax = widths[0]
 m_ne = re.search(r'N_EXT_LIST=\[([0-9,\s]*)\]', gtxt)
 next_ext = [int(x) for x in m_ne.group(1).split(',')] if m_ne else [0] * D
+# ★2026-10-16 TOPEXT 構造（gen_cone_ext.py TOPEXT=1。PI ノード方式 r1536pi 用）:
+#   段0 の PA i は I_A=EXT[i], I_B=1'b1 で IMUX 無し。cone に I ポートは無く EXT[0..EXTBUS-1] だけ。
+#   段1 以降の IMUX に EXT は入らない（N_EXT_LIST は全0）。
+TOPEXT = bool(re.search(r'PA pa_c0_0 \(\.PA_I_A\(EXT\[0\]\)', gtxt))
+m_eb = re.search(r'EXTBUS=(\d+)', gtxt)
+EXTBUS = int(m_eb.group(1)) if m_eb else max(next_ext)
 skips = defaultdict(list)
 for mm in re.finditer(r'//\s*skip:\s*行(\d+)→行(\d+)\s*\((\d+)段飛び\)\s*#(\d+)', gtxt):
     skips[int(mm.group(2))].append((int(mm.group(3)), int(mm.group(4))))
@@ -67,7 +73,8 @@ for c in FFSTAGES:
     for i in range(widths[c]):
         ff_index[(c, i)] = _k; _k += 1
 from cand_rules import make_cand   # ★2026-09-17 CAND_RULE は構造生成時と同じ値を渡すこと
-patterns = [make_cand(widths[s], widths[s + 1], os.environ.get("CAND_RULE", "now")) for s in range(D - 1)]
+# ★2026-10-16 row=段 を渡す（gen_cone_ext.py / place_fixed_tbl.py と同じ。alt_cyc は段ごとに規則が変わる）
+patterns = [make_cand(widths[s], widths[s + 1], os.environ.get("CAND_RULE", "now"), row=s + 1) for s in range(D - 1)]
 
 # ---- CONFIG_DATA レイアウト (gen_cone_ext と同順: skip→imux→pa→ff) ----
 pos = 0; skip_cfg = {}
@@ -162,7 +169,8 @@ for o, info in cells.items():
         if s in col or s in CONST or s in dff_q or s in ('clk', 'rst'): continue
         if s not in ext_signals: ext_signals.append(s)
 ext_idx = {s: k for k, s in enumerate(ext_signals)}
-maxext = max(next_ext)
+maxext = EXTBUS if TOPEXT else max(next_ext)
+if TOPEXT: assert not ext_signals, f"TOPEXT 構造なのに段1以降が PI を直接読む: {ext_signals[:5]}"
 assert len(ext_signals) <= maxext, f"EXT不足: 需要{len(ext_signals)} > 枠{maxext}"
 
 # ---- config bit配列 ----
@@ -171,7 +179,7 @@ def setv(start, width, value):
     for k in range(width): bits[start + k] = format(value, f'0{width}b')[::-1][k]
 
 dff_dcells = {rz(d['D']) for d in dffs}   # 登録(ff=0)セル。FFfbは登録値を運ぶ
-warn = []; Iwire = {}; skip_use_count = defaultdict(int)
+warn = []; Iwire = {}; topext = {}; skip_use_count = defaultdict(int)
 for o, info in cells.items():
     if o not in col: continue
     c = col[o]; i = row[o]
@@ -180,6 +188,10 @@ for o, info in cells.items():
     for port, s in [('ia', info['I_a']), ('ib', info['I_b'])]:
         if s is None: continue
         s = rz(s)
+        if c == 0 and TOPEXT:                       # ★段0 の PA i: I_A=EXT[i]（I_B は 1'b1 固定）
+            if port == 'ia': topext[i] = s
+            elif s != '$true': warn.append(f"段0 の I_b が $true でない（構造は 1'b1 固定）: {o}<-{s}")
+            continue
         if c == 0:                                  # stage0はI[]直受け(IMUX無し)
             Iwire[2 * i + (0 if port == 'ia' else 1)] = s
             continue
@@ -278,18 +290,22 @@ if SERIAL:
     L.append(f"    CONF_SHIFT #(.NBIT({n_cfg})) u_conf (.CONF_CLK(CONF_CLK), .CONF_RESETL(CONF_RESETL),"
              f" .CONF_MODE(CONF_MODE), .CONF_IN(CONF_IN), .CONF_E(CONF_E), .CONF_OUT(CONF_OUT),"
              f" .CONFIG_DATA(CONFIG_DATA));")
-if Wmax: L.append(f"    wire [{2*Wmax-1}:0] I;")     # width[0]=0(段0が空)ならIバス省略
+HAS_I = Wmax and not TOPEXT                     # TOPEXT 構造は I ポート無し
+if HAS_I: L.append(f"    wire [{2*Wmax-1}:0] I;")     # width[0]=0(段0が空)ならIバス省略
 L.append(f"    wire [{n_ff-1}:0] pa_o;")
 if maxext: L.append(f"    wire [{maxext-1}:0] EXT;")
-for k in range(2 * Wmax):
+for k in range(2 * Wmax if HAS_I else 0):
     L.append(f"    assign I[{k}] = {feed(Iwire.get(k))};")
+if TOPEXT:                                      # 使わない EXT 線は 0
+    for k in range(EXTBUS):
+        L.append(f"    assign EXT[{k}] = {feed(topext.get(k))};")
 for s, k in ext_idx.items():
     L.append(f"    assign EXT[{k}] = {feed(s)};")   # データPIのみ(DFF-QはFFfbで内部帰還)
 for p in pos_out:
     s = out_slot[p]
     L.append(f"    assign {p} = " + (f"pa_o[{s}];" if s is not None else "1'b0;  // 未対応"))
 L.append(f"    cone u_cone (.CLK({clk_expr}), .PAE_RST_N({rst_expr}), "
-         + (".I(I), " if Wmax else "")
+         + (".I(I), " if HAS_I else "")
          + (".EXT(EXT), " if maxext else "")
          + f".pa_o(pa_o), .CONFIG_DATA({'CONFIG_DATA' if (CFGPORT or SERIAL) else f'{n_cfg}' + chr(39) + 'b' + cfgconst}));")
 L.append("endmodule")
@@ -308,8 +324,10 @@ M = [f"# {CKT}: SoPA I/O マップ  (構造={os.path.basename(GRIDV)}, CONFIG={n
      f"CLK        <= {clk_expr}",
      f"PAE_RST_N  <= {rst_expr}",
      f"# 入力: 段0は I[] で直受け, 段1以降は EXT[] 経由",
-     f"I_WIDTH    = {2*Wmax}", f"EXT_WIDTH  = {maxext}", f"PA_O_WIDTH = {n_ff}"]
-for k in range(2 * Wmax):
+     f"I_WIDTH    = {2*Wmax if HAS_I else 0}", f"EXT_WIDTH  = {maxext}", f"PA_O_WIDTH = {n_ff}"]
+for k in sorted(topext):
+    M.append(f"EXT[{k}]    <= {topext[k]}  (段0 PA{k} = PI ノード)")
+for k in range(2 * Wmax if HAS_I else 0):
     M.append(f"I[{k}]      <= {feed(Iwire.get(k))}")
 for s, k in sorted(ext_idx.items(), key=lambda t: t[1]):
     M.append(f"EXT[{k}]    <= {s}")

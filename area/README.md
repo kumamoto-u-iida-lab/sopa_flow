@@ -57,3 +57,10 @@ cd area && JOBS=1 ./run_sopa_conf_new.sh |& tee run_sopa_conf_new.log   # mm20r2
 ```bash
 cd area && JOBS=1 TARGETS="superset_pi_ff7_s100_alt_cyc superset_pi_ff7_s105_alt_cyc superset_pi_ff7_s110_alt_cyc superset_pi_ff7_s115_alt_cyc superset_pi_ff7_s120_alt_cyc superset_pi_ff7_s135_alt_cyc superset_pi_ff7_s150_alt_cyc" ./run_sopa_conf_new.sh |& tee run_sweep_ff7_area.log
 ```
+
+## 2026-10-20 追加: 外部入力を論理の1つ上で受ける構造（superset_pilocal_s120_alt_cyc）
+PI ノードを回路ごとに論理の一番上の行の1つ上に置き、行1〜17 の ia に専用の EXT[j mod 45] を1本足した構造（structures/README.md）。
+包絡線 1,072 ×1.2 = 1,289PA、14,917bit、19段、EXT 45本。見積もり 479,500〜491,700 μm²（bit／IMUX 入力の直線、推測）。
+```bash
+cd area && JOBS=1 TARGETS="superset_pilocal_s120_alt_cyc" ./run_sopa_conf_new.sh |& tee run_pilocal_area.log
+```

@@ -12,6 +12,9 @@
      TOPEXT … ★2026-10-14 1 にすると段0(入力側)を外部ピン I でなく外部入力バス EXT[0..w0-1] に1対1で直結する:
               PA i の I_A=EXT[i], I_B=1'b1（MODE 00 で出力=EXT[i]、PI ノード）。IMUX・選択ビットは無し。
               どの PI をどの EXT 線に流すかは回路ごとに自由（PI ノード方式 r1536pi 用）。既定 0 = 従来どおり I を直受け。
+     EXTDED… ★2026-10-20 N にすると外部入力バスを N 本にし、段0(TOPEXT=1 が前提) の PA i は EXT[i mod N] を直受け、
+              段1..D-2（FF の段を除く）の PA i は ia の IMUX に専用の EXT[i mod N] を1本だけ足す（ib は足さない）。
+              どの行の PA も「1つ上で外部入力を受ける PI ノード」（ia=EXT, ib=1, MODE 00）になれる。既定 0 = 無し。
    出力: cone_spindle_<a-b-...>[_<NEXTTAG>].v / .png"""
 import sys, math, os
 try:
@@ -53,9 +56,14 @@ else:
 NEXT_MAX = max(next_ext) if next_ext else 0
 NEXTTAG = os.environ.get("NEXTTAG", "")
 TOPEXT = os.environ.get("TOPEXT", "0") == "1"
-if TOPEXT:
+EXTDED = int(os.environ.get("EXTDED", "0"))
+if EXTDED:
+    assert TOPEXT and NEXT_MAX == 0, "EXTDED は TOPEXT=1・NEXT=全0 と組で使う"
+    NEXT_MAX = EXTDED
+elif TOPEXT:
     assert NEXT_MAX <= widths[0], "TOPEXT=1 では EXT バス幅 = 段0 の列数（各段の NEXT はそれ以下）"
     NEXT_MAX = widths[0]
+ded = lambda c, port: 1 if (EXTDED and 1 <= c <= D - 2 and port == 'ia') else 0   # 専用 EXT 1本
 
 TAG = "spindle_" + "-".join(map(str, ff_to_in)) + (("_" + NEXTTAG) if NEXTTAG else "")
 SD = os.path.dirname(os.path.abspath(__file__))
@@ -157,7 +165,7 @@ def gen_verilog():
         for i in range(widths[c]):
             n = len(patterns[c - 1][i]) + nin + n_ff + next_ext[c] + 2
             for port in ('ia', 'ib'):
-                imux_cfg[(c, i, port)] = (pos, SELW(n)); pos += SELW(n)
+                imux_cfg[(c, i, port)] = (pos, SELW(n + ded(c, port))); pos += SELW(n + ded(c, port))
     n_imux_bits = pos - n_skip_bits
     pa_cfg = {}
     for c in range(D):
@@ -174,11 +182,12 @@ def gen_verilog():
         nin = len(skips_at(c))
         for i in range(widths[c]):
             sizes.add(len(patterns[c - 1][i]) + nin + n_ff + next_ext[c] + 2)
+            if ded(c, 'ia'): sizes.add(len(patterns[c - 1][i]) + nin + n_ff + next_ext[c] + 3)
         for (dist, j) in skips_at(c):
             sizes.add(widths[c - dist])
 
     L = []
-    L.append(f"// spindle widths(入力側->FF側)={widths}  N_EXT_LIST={next_ext}  EXTBUS={NEXT_MAX}  CONFIG={n_cfg}bit")
+    L.append(f"// spindle widths(入力側->FF側)={widths}  N_EXT_LIST={next_ext}  EXTBUS={NEXT_MAX}{f"  EXTDED={EXTDED}" if EXTDED else ""}  CONFIG={n_cfg}bit")
     L.append(f"//   skip={n_skip_bits} / imux={n_imux_bits} / pa={sum(widths)*2} / ff={n_ff} (最下段/FF側のみ)")
     L.append(PA_MODULE); L.append(""); L.append(FF_MODULE); L.append("")
     L.append(imux_modules(sizes)); L.append("")
@@ -211,7 +220,7 @@ def gen_verilog():
     if TOPEXT:
         L.append(f"    // ===== 段0 (入力側, w={Wmax}) : PI ノード。PA i が EXT[i] を直受け（I_B=1, MODE 00 で出力=EXT[i]） =====")
         for i in range(Wmax):
-            L.append(f"    PA pa_c0_{i} (.PA_I_A(EXT[{i}]), .PA_I_B(1'b1), "
+            L.append(f"    PA pa_c0_{i} (.PA_I_A(EXT[{i % NEXT_MAX}]), .PA_I_B(1'b1), "
                      f".PA_O_A({owire(0,i)}), .PROG_DATA(CONFIG_DATA[{pa_cfg[(0,i)]} +: 2]));")
     else:
         L.append(f"    // ===== 段0 (入力側, w={Wmax}) : PA が外部入力 I を直受け =====")
@@ -245,12 +254,14 @@ def gen_verilog():
                      + (f" + skip{len(skin)}本" if skin else "")
                      + (f" + FFfb{n_ff}本" if n_ff else "")
                      + (f" + EXT{ne}本" if ne else "")
-                     + " + 定数2本")
+                     + " + 定数2本"
+                     + (f" + ia専用EXT[{i % EXTDED}]" if ded(c, 'ia') else ""))
             for port in ('ia', 'ib'):
                 ins = [owire(c-1, ci[k]) for k in range(nbase)] + skin + ffb_in + ext_in + const_in
-                conn = ", ".join(f".IMUX_I_{k}({ins[k]})" for k in range(ntot))
+                if ded(c, port): ins = ins + [f"EXT[{i % EXTDED}]"]      # 専用 EXT は最後に足す（既存の番号は変えない）
+                conn = ", ".join(f".IMUX_I_{k}({ins[k]})" for k in range(len(ins)))
                 st, w = imux_cfg[(c, i, port)]
-                L.append(f"    IMUX_IN{ntot:03d} imux_c{c}_{i}_{port} ({conn}, "
+                L.append(f"    IMUX_IN{len(ins):03d} imux_c{c}_{i}_{port} ({conn}, "
                          f".IMUX_O(sel_c{c}_{i}_{port}), .PROG_DATA(CONFIG_DATA[{st} +: {w}]));")
         for i in range(widths[c]):
             o = f"ffn_c{c}_{i}" if c in FFSTAGES else owire(c, i)

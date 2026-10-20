@@ -41,6 +41,8 @@ widths = [int(x) for x in re.search(r'widths\([^)]*\)=\s*\[([0-9,\s]*)\]', gtxt)
 D = len(widths)
 m_ne = re.search(r'N_EXT_LIST=\[([0-9,\s]*)\]', gtxt)
 next_ext = [int(x) for x in m_ne.group(1).split(',')] if m_ne else [0] * D
+m_dd = re.search(r'EXTDED=(\d+)', gtxt.splitlines()[0])   # ★2026-10-20 ia 専用 EXT（gen_cone_ext.py EXTDED）
+EXTDED = int(m_dd.group(1)) if m_dd else 0
 OFF = {}; o_ = 0
 for h in range(D):
     OFF[h] = o_; o_ += widths[D - 1 - h]
@@ -81,6 +83,20 @@ for c in logic:
             if not (ok(hs, cs, he, ce) and ok(he, ce, hu, cu)): err.append(f"{s}->{u}: 中継経由が候補表に無い")
         else:
             err.append(f"{s}->{u}: 行の差 {g}")
+if EXTDED:   # ★2026-10-20: PI ノードの列 mod EXTDED = その PI の線、線は PI ごとに全部違う、FF の行に PI ノード無し
+    ex = J.get('ext') or {}
+    if len(set(ex.values())) != len(ex): err.append("EXT の線が重複")
+    for l in open(EB):
+        if l.startswith('.subckt cell'):
+            pp = dict(t.split('=', 1) for t in l.split()[2:]); o = pp['O_a']
+            if o not in cbo: continue
+            if pp.get('I_b') in pis: err.append(f"{o}: PI を ib で読む")
+            if pp.get('I_a') in pis:
+                hh, kk = pos(SL[o])
+                if hh == 0 or pp.get('I_b') != '$true': err.append(f"{o}: PI ノードの形でない／FF の行")
+                elif ex.get(pp['I_a']) is None or kk % EXTDED != ex[pp['I_a']]:
+                    err.append(f"{o}: 列{kk} に EXT[{ex.get(pp['I_a'])}] は来ない")
+    next_ext = [len(pis)] * D                         # 以下の枠の検算は使わない（全部通す）
 pi_at = defaultdict(set)
 for c in logic:
     if c['o'] in cbo:
@@ -92,7 +108,8 @@ import ext_nest
 _pr = defaultdict(set)
 for h, ps in pi_at.items():
     for p in ps: _pr[p].add(h)
-if 'ext' in J and J['ext'] is not None:
+if EXTDED: pass
+elif 'ext' in J and J['ext'] is not None:
     err += ext_nest.verify(_pr, D, next_ext, J['ext'])
 elif len({next_ext[c] for c in range(1, D)}) > 1:
     _b = ext_nest.check(_pr, D, next_ext)

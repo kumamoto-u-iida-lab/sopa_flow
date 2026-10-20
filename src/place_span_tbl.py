@@ -76,6 +76,8 @@ widths = [int(x) for x in re.search(r'widths\([^)]*\)=\s*\[([0-9,\s]*)\]', gtxt)
 D = len(widths)
 m_ne = re.search(r'N_EXT_LIST=\[([0-9,\s]*)\]', gtxt)
 next_ext = [int(x) for x in m_ne.group(1).split(',')] if m_ne else [0] * D
+m_dd = re.search(r'EXTDED=(\d+)', gtxt.splitlines()[0])   # ★2026-10-20 ia 専用 EXT（gen_cone_ext.py EXTDED）
+EXTDED = int(m_dd.group(1)) if m_dd else 0
 W = lambda h: widths[D - 1 - h]                     # 行h の列数
 OFF = {}; _o = 0
 for h in range(D):                                  # 通し番号 = OFF[行] + 列
@@ -219,13 +221,31 @@ for s_, y_, use_ in ftrec:
     m.Add(sl == _dm).OnlyEnforceIf(use_.Not()); _alld.append(sl); _dm += 1
 m.AddAllDifferent(_alld)
 
+# ★2026-10-20 EXTDED: PI を読むのは PI ノード（I_a=PI, I_b=$true）だけ。PI ごとに線を1本（全部違う線）、
+#   PI ノードがマス(h,k)にいるなら k mod EXTDED = 線。行の枠（N_EXT_LIST）と入れ子は使わない。
+pinode = {}; line = {}
+if EXTDED:
+    for l in open(EB):
+        if l.startswith('.subckt cell'):
+            pp = dict(t.split('=', 1) for t in l.split()[2:]); o = pp['O_a']
+            if o not in cbo: continue
+            if pp.get('I_b') in PI or (pp.get('I_a') in PI and (pp.get('I_b') != '$true' or 0 in dom[o])):
+                print(f"結果: ERROR(EXTDED) {o} は PI ノードの形でない（ia=PI, ib=$true, FF の行以外）"); sys.exit()
+            if pp.get('I_a') in PI: pinode[o] = pp['I_a']
+    if len(set(pinode.values())) > EXTDED:
+        print(f"結果: INFEASIBLE(外部入力の本数) PI {len(set(pinode.values()))} 本 > バス {EXTDED} 本"); sys.exit()
+    line = {p: m.NewIntVar(0, EXTDED - 1, '') for p in sorted(set(pinode.values()))}
+    if len(line) > 1: m.AddAllDifferent(list(line.values()))
+    for o, p in pinode.items():
+        for (h, k), b in x[o].items(): m.Add(line[p] == k % EXTDED).OnlyEnforceIf(b)
+    print(f"EXTDED={EXTDED}: PI ノード {len(pinode)} 個 / PI {len(line)} 本", flush=True)
 # 外部入力の行ごとの枠（構造の段0は直受けで対象外）
 used = {}
 for c in logic:
     u = c['o']
     if u not in cbo: continue
     for p in c['srcs']:
-        if p in PI:
+        if p in PI and not EXTDED:
             for h in dom[u]:
                 if D - 1 - h == 0: continue
                 if (p, h) not in used: used[p, h] = m.NewBoolVar('')
@@ -290,7 +310,7 @@ if name in ("FEASIBLE", "OPTIMAL"):
         if c['o'] in cbo:
             for p in c['srcs']:
                 if p in PI: _pr[p].add(pos[c['o']][0])
-    ext_of = ext_nest.assign(_pr, D, next_ext)
+    ext_of = {p: sv.Value(v) for p, v in line.items()} if EXTDED else ext_nest.assign(_pr, D, next_ext)
     if ext_of is None: extra += "  ★外部入力の割り当て失敗（制約の誤り）"
     json.dump({'h': {o: pos[o][0] for o in cbo}, 'slot': {o: OFF[pos[o][0]] + pos[o][1] for o in cbo},
                'MODE': MODE, 'FT': FT, 'ft': ft, 'via': via, 'ext': ext_of},

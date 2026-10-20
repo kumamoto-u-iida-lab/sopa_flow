@@ -138,3 +138,12 @@ PA 768（1,536 の半分）で、載ると見込める回路だけを対象に�
 → ③ ff7 と同じ肉付け（行0=7、最上段=PI 最大の 20、隣2倍以内、倍率 f=1.182）。
 列数（FF 側→入力側）[7,14,28,52,80,91,86,69,56,43,30,24×8,20]、768PA、8,327bit、外部入力バス 20本、IMUX 最大 18。
 対象26回路と列数は results/pa768_select.json。再生成: `BUDGET=768 MARGIN=1.2 KEEP=micks python3 src/select_pa_budget.py` → 表示された列数で gen_cone_ext.py（ff7 と同じ環境変数）。
+
+## 外部入力を「論理の1つ上」で受ける構造（2026-10-20、superset_pilocal_s120_alt_cyc.v）
+ユーザー案。行19 だけに外部入力を入れて鎖で運ぶ方式（PI ノード 7,713個）をやめ、PI ノードを回路ごとに論理の一番上の行の1つ上に置く。
+- ネットリスト: `OUTDIR=data/eblif_pilocal TOP=local python3 src/insert_pi_nodes.py`（41回路、運ぶためのセル 3,584、合計 16,991）
+- 構造: 行1〜17 の PA j の ia に専用の EXT[j mod 45] を1本だけ足す（ib・FF の行には足さない）、段0（最上段）は EXT[j mod 45] 直結。
+  `EXTDED=45 TOPEXT=1 CAND_RULE=alt_cyc SKIP_SPECS=2:0 NEXT=0×19 NEXTTAG=pilocal gen_cone_ext.py <列数>`
+- 列数: `EBDIR=data/eblif_pilocal NROW=19 SCALE=1.2 python3 src/envelope_widths.py` → 包絡線 1,072 ×1.2 = [7,14,28,53,81,122,168,165,149,114,82,63,53,52,34,30,27,24,23]
+  1,289PA、14,917bit、19段（行19 は無し）。
+- 配置: place_fixed_tbl.py / place_span_tbl.py / check_span.py が見出しの EXTDED を読み、PI ごとに線を1本（全部違う線）、PI ノードは「列 mod 45 = 線」の列だけ。

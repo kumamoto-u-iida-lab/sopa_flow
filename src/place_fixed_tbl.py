@@ -24,6 +24,11 @@ D = len(widths)
 # 外部入力の段別枠 next_ext (入力側->FF側)
 m_ne = re.search(r'N_EXT_LIST=\[([0-9,\s]*)\]', gtxt)
 next_ext = [int(x) for x in m_ne.group(1).split(',')] if m_ne else [0] * D
+# ★2026-10-20 EXTDED=N（gen_cone_ext.py）: 段0 と 段1..D-2 の PA j の ia に専用の EXT[j mod N] が1本ある。
+#   PI を読めるのは PI ノード（I_a=PI, I_b=$true）だけ。PI ごとに線 line[p] を決め（全部違う線）、
+#   PI ノードは「列 mod N = line[p]」の列にだけ置ける。段ごとの枠（N_EXT_LIST）と入れ子の判定は使わない。
+m_dd = re.search(r'EXTDED=(\d+)', gtxt.splitlines()[0])
+EXTDED = int(m_dd.group(1)) if m_dd else 0
 
 
 def pis_of(eblif):
@@ -106,7 +111,7 @@ for c in logic:
     for s in c['srcs']:
         if s in PI:
             pi_at[col_of[u]].add(s)
-ext_over = [(c, len(pis), next_ext[c]) for c, pis in pi_at.items()
+ext_over = [] if EXTDED else [(c, len(pis), next_ext[c]) for c, pis in pi_at.items()
             if c >= 1 and len(pis) > next_ext[c]]
 if ext_over:
     print(f"結果: INFEASIBLE(外部入力枠不足) 超過(段,相異なるPI需要,枠)={ext_over}")
@@ -117,11 +122,25 @@ import ext_nest
 pi_rows = defaultdict(set)
 for c_, ps_ in pi_at.items():
     for p_ in ps_: pi_rows[p_].add(D - 1 - c_)
-_bad = ext_nest.check(pi_rows, D, next_ext)
+_bad = None if EXTDED else ext_nest.check(pi_rows, D, next_ext)
 if _bad:
     print(f"結果: INFEASIBLE(外部入力の入れ子) 枠{_bad[0]}本以下の行で使うPIが{_bad[1]}本")
     sys.exit()
-ext_of = ext_nest.assign(pi_rows, D, next_ext)
+ext_of = {} if EXTDED else ext_nest.assign(pi_rows, D, next_ext)
+pinode = {}                                      # EXTDED: PI ノード o -> 読む PI
+if EXTDED:
+    for l in open(EB):
+        if l.startswith('.subckt cell'):
+            pp = dict(t.split('=', 1) for t in l.split()[2:]); o = pp['O_a']
+            if o not in col_of: continue
+            if pp.get('I_b') in PI:
+                print(f"結果: ERROR(EXTDED) {o} が PI を ib で読む（ia 専用なので不可）"); sys.exit()
+            if pp.get('I_a') in PI:
+                if pp.get('I_b') != '$true' or col_of[o] == D - 1:
+                    print(f"結果: ERROR(EXTDED) {o} は PI ノードの形でない／FF の段にある"); sys.exit()
+                pinode[o] = pp['I_a']
+    if len(set(pinode.values())) > EXTDED:
+        print(f"結果: INFEASIBLE(外部入力の本数) PI {len(set(pinode.values()))} 本 > バス {EXTDED} 本"); sys.exit()
 
 # ---- skip需要(静的) ----
 skipdemand = defaultdict(int)
@@ -192,6 +211,12 @@ for cu in range(1, D):
     pairs[cu] = [(rp, r) for r in range(widths[cu]) for rp in cand[cu][r]]
 for s, u in edges1:
     m.AddAllowedAssignments([row[s], row[u]], pairs[col_of[u]])
+if EXTDED:
+    line = {p: m.NewIntVar(0, EXTDED - 1, '') for p in sorted(set(pinode.values()))}
+    if len(line) > 1: m.AddAllDifferent(list(line.values()))
+    for o, p in pinode.items():
+        m.AddModuloEquality(line[p], row[o], EXTDED)
+    print(f"EXTDED={EXTDED}: PI ノード {len(pinode)} 個 / PI {len(line)} 本（PI ノードは 列 mod {EXTDED} = 線 の列だけ）", flush=True)
 
 sv = cp_model.CpSolver()
 sv.parameters.max_time_in_seconds = int(os.environ.get("ATIME", "120"))
@@ -200,6 +225,7 @@ st = sv.Solve(m)
 print(f"結果: {sv.StatusName(st)} ({sv.WallTime():.0f}s)  gap1={len(edges1)} skip={nskip}"
       f"  外部入力需要(段:相異PI)={ {c: len(p) for c, p in sorted(pi_at.items())} }", flush=True)
 if sv.StatusName(st) in ('FEASIBLE', 'OPTIMAL'):
+    if EXTDED: ext_of = {p: sv.Value(v) for p, v in line.items()}
     json.dump({'col': col_of, 'row': {o: sv.Value(row[o]) for o in cbo}, 'ext': ext_of},
               open(f'place_fixed_tbl_{CKT}.json', 'w'), ensure_ascii=False)
     print(f"  保存: place_fixed_tbl_{CKT}.json")

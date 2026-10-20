@@ -11,6 +11,8 @@
   増えるノード = PI 1本につき TOP − h_min 個。段数はどの回路も TOP+1 になる。
 ■ 行（FF 側から）は段固定と同じ: R（FF までの最長距離）、組合せPO を出すセルは 0。
   作った後に load() で行を計算し直し、ノードが狙いの行に、元のセルが元の行にあることを確かめる（ずれたら止める）。
+ ★2026-10-20 TOP=local: PI ノードを回路ごとに「論理の一番上の行の1つ上」（行 D_回路）に置く（ユーザー案）。
+   構造側は全行の ia に専用の EXT を1本足す（gen_cone_ext.py EXTDED）。増えるノード = PI 1本につき D_回路 − h_min 個。
  使い方: python3 insert_pi_nodes.py [回路名...]
  環境:   EBDIR（入力, 既定 results/eblif_relay） OUTDIR（既定 results/eblif_pinode） TOP（既定 19）
 """
@@ -24,7 +26,9 @@ from annotate_row import comb_po_cells
 ROOT = os.path.dirname(SD)
 EBDIR = os.environ.get("EBDIR", os.path.join(ROOT, "results", "eblif_relay"))
 OUTDIR = os.environ.get("OUTDIR", os.path.join(ROOT, "results", "eblif_pinode"))
-TOP = int(os.environ.get("TOP", "19"))
+TOPENV = os.environ.get("TOP", "19")
+LOCAL = TOPENV == "local"
+TOP = 0 if LOCAL else int(TOPENV)
 
 
 def rows_of(eb):
@@ -39,6 +43,7 @@ def one(c):
     lines = open(eb).read().splitlines()
     row = rows_of(eb)
     pis = set(next(l for l in lines if l.startswith('.inputs')).split()[1:])
+    TOP = max(row.values()) + 1 if LOCAL else globals()['TOP']   # local: 論理の一番上の1つ上
     if max(row.values()) + 1 > TOP:
         return f"{c}: 段数 {max(row.values()) + 1} が TOP={TOP} 以上なので不可"
     # PI を読むセルと h_min

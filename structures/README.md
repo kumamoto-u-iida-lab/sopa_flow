@@ -131,3 +131,10 @@ r1536pi（2026-10-14）= 外部入力 EXT 45本は段0（45列）にだけ入る
   段1以降の IMUX には EXT を配らない。PI は PI ノードから中継の鎖で使う行まで下ろす（src/insert_pi_nodes.py、data/eblif_pinode）。
   列数 = small 41回路の PI ノード込みの行ごとの最大（包絡線）を、段0=45 に固定して残り 1,491 を 1.271倍で配る。合計 1,536、隣2倍以内、交互。
   再生成: `cd src && TOPEXT=1 CAND_RULE=alt_cyc SKIP_SPECS=2:0 NEXT=0$(printf ',0%.0s' $(seq 19)) NEXTTAG=pinode python3 gen_cone_ext.py 9,15,30,56,85,128,178,174,157,121,86,66,56,55,55,55,55,55,55,45`
+
+## PA 768 の構造（2026-10-20、superset_pi768_alt_cyc.v）
+PA 768（1,536 の半分）で、載ると見込める回路だけを対象にしたスーパーセット。作り方は `src/select_pa_budget.py`:
+① PI ノード入り（data/eblif_pinode）の配置する PA ≤ 768 の 34回路 → ② 包絡線 ≤ 768/1.2 になるまで PA の大きい順に外し（25回路）、micks を戻して 26回路・包絡線 649（余白 1.18倍）
+→ ③ ff7 と同じ肉付け（行0=7、最上段=PI 最大の 20、隣2倍以内、倍率 f=1.182）。
+列数（FF 側→入力側）[7,14,28,52,80,91,86,69,56,43,30,24×8,20]、768PA、8,327bit、外部入力バス 20本、IMUX 最大 18。
+対象26回路と列数は results/pa768_select.json。再生成: `BUDGET=768 MARGIN=1.2 KEEP=micks python3 src/select_pa_budget.py` → 表示された列数で gen_cone_ext.py（ff7 と同じ環境変数）。

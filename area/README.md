@@ -64,3 +64,9 @@ PI ノードを回路ごとに論理の一番上の行の1つ上に置き、行1
 ```bash
 cd area && JOBS=1 TARGETS="superset_pilocal_s120_alt_cyc" ./run_sopa_conf_new.sh |& tee run_pilocal_area.log
 ```
+
+## 2026-10-21 追加: EXT を受ける列を絞った r1536（superset_r1536_xc_{head,tail,even,reach2}_alt_cyc）
+比較の相手は PA 1,536 の r1536（1,100,898）/ ext45n（871,531）/ ff7（568,105）。見積もり 約 677,000 μm²（推測）。
+```bash
+cd area && JOBS=1 TARGETS="superset_r1536_xc_even_alt_cyc superset_r1536_xc_reach2_alt_cyc superset_r1536_xc_tail_alt_cyc superset_r1536_xc_head_alt_cyc" ./run_sopa_conf_new.sh |& tee run_xc_area.log
+```

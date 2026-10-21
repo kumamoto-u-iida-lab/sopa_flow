@@ -15,6 +15,9 @@
      EXTDED… ★2026-10-20 N にすると外部入力バスを N 本にし、段0(TOPEXT=1 が前提) の PA i は EXT[i mod N] を直受け、
               段1..D-2（FF の段を除く）の PA i は ia の IMUX に専用の EXT[i mod N] を1本だけ足す（ib は足さない）。
               どの行の PA も「1つ上で外部入力を受ける PI ノード」（ia=EXT, ib=1, MODE 00）になれる。既定 0 = 無し。
+     EXTM / EXTSEL … ★2026-10-21 EXT を受ける列を段ごとに絞る。EXTM=段ごとの列数（入力側->FF側, 長さD）、
+              EXTSEL=head(先頭)/tail(末尾)/even(等間隔)/reach2(次段の2列以上に届く列から等間隔)。
+              選んだ列の IMUX（ia・ib 両方）にだけ next_ext[c] 本の EXT を入れる。見出し2行目に // EXTCOLS を書く。
    出力: cone_spindle_<a-b-...>[_<NEXTTAG>].v / .png"""
 import sys, math, os
 try:
@@ -81,6 +84,31 @@ print(f"候補規則 CAND_RULE={CAND_RULE}  候補総数={sum(len(x) for p in pa
 
 print(f"幅(入力側->FF側) = {widths}   段数D={D}  FF={B}個")
 print(f"段別外部入力 next_ext(入力->FF) = {next_ext}  (EXTバス幅={NEXT_MAX})")
+
+# ★2026-10-21 EXT を受ける列（EXTM/EXTSEL）
+EXTSEL = os.environ.get("EXTSEL", "")
+extcols = None
+if EXTSEL:
+    em = [int(x) for x in os.environ["EXTM"].split(",")]; assert len(em) == D
+    extcols = {}
+    for c in range(D):
+        Wc, mc = widths[c], min(em[c], widths[c])
+        if c == 0 or mc == 0: extcols[c] = set(range(Wc)) if c == 0 else set(); continue
+        even = lambda pool, m: sorted({pool[(i * len(pool)) // m] for i in range(m)})
+        if EXTSEL == "head": cs = list(range(mc))
+        elif EXTSEL == "tail": cs = list(range(Wc - mc, Wc))
+        elif EXTSEL == "even": cs = even(list(range(Wc)), mc)
+        elif EXTSEL == "reach2":
+            reach = [0] * Wc
+            if c < D - 1:
+                for pl in patterns[c]:
+                    for k in pl: reach[k] += 1
+            pool = [k for k in range(Wc) if reach[k] >= 2]
+            cs = even(pool, mc) if len(pool) >= mc else pool + sorted(set(range(Wc)) - set(pool), key=lambda k: -reach[k])[:mc - len(pool)]
+        else: raise SystemExit(f"EXTSEL={EXTSEL} は不明")
+        extcols[c] = set(cs); assert len(cs) == mc
+    print(f"EXT を受ける列（EXTSEL={EXTSEL}）: 段ごとの列数 {[len(extcols[c]) for c in range(D)]} 計 {sum(len(extcols[c]) for c in range(1, D))}")
+nec = lambda c, i: next_ext[c] if (extcols is None or i in extcols[c]) else 0   # 列 i が受ける EXT の本数
 
 SELW = lambda n: max(1, math.ceil(math.log2(n)))
 # skip の行選択に要るビット数。出発段の幅が1なら選ぶ相手が1本しかない＝muxも設定ビットも不要(0bit)。
@@ -163,7 +191,7 @@ def gen_verilog():
     for c in range(1, D):
         nin = len(skips_at(c))
         for i in range(widths[c]):
-            n = len(patterns[c - 1][i]) + nin + n_ff + next_ext[c] + 2
+            n = len(patterns[c - 1][i]) + nin + n_ff + nec(c, i) + 2
             for port in ('ia', 'ib'):
                 imux_cfg[(c, i, port)] = (pos, SELW(n + ded(c, port))); pos += SELW(n + ded(c, port))
     n_imux_bits = pos - n_skip_bits
@@ -181,14 +209,16 @@ def gen_verilog():
     for c in range(1, D):
         nin = len(skips_at(c))
         for i in range(widths[c]):
-            sizes.add(len(patterns[c - 1][i]) + nin + n_ff + next_ext[c] + 2)
-            if ded(c, 'ia'): sizes.add(len(patterns[c - 1][i]) + nin + n_ff + next_ext[c] + 3)
+            sizes.add(len(patterns[c - 1][i]) + nin + n_ff + nec(c, i) + 2)
+            if ded(c, 'ia'): sizes.add(len(patterns[c - 1][i]) + nin + n_ff + nec(c, i) + 3)
         for (dist, j) in skips_at(c):
             sizes.add(widths[c - dist])
 
     L = []
-    L.append(f"// spindle widths(入力側->FF側)={widths}  N_EXT_LIST={next_ext}  EXTBUS={NEXT_MAX}{f"  EXTDED={EXTDED}" if EXTDED else ""}  CONFIG={n_cfg}bit")
+    L.append(f"// spindle widths(入力側->FF側)={widths}  N_EXT_LIST={next_ext}  EXTBUS={NEXT_MAX}{f"  EXTDED={EXTDED}" if EXTDED else ""}{f"  EXTSEL={EXTSEL}" if EXTSEL else ""}  CONFIG={n_cfg}bit")
     L.append(f"//   skip={n_skip_bits} / imux={n_imux_bits} / pa={sum(widths)*2} / ff={n_ff} (最下段/FF側のみ)")
+    if extcols is not None:
+        L.append("// EXTCOLS " + ";".join(f"{c}:" + ",".join(map(str, sorted(extcols[c]))) for c in range(1, D)))
     L.append(PA_MODULE); L.append(""); L.append(FF_MODULE); L.append("")
     L.append(imux_modules(sizes)); L.append("")
 
@@ -249,6 +279,7 @@ def gen_verilog():
         const_in = ["1'b0", "1'b1"]
         for i in range(widths[c]):
             ci = patterns[c-1][i]; nbase = len(ci)
+            ne = nec(c, i); ext_in = [f"EXT[{e}]" for e in range(ne)]   # ★EXTSEL: 選んだ列だけ EXT
             ntot = nbase + len(skin) + n_ff + ne + 2
             L.append(f"    // 行{c} PA{i}: 候補(前行)= {ci}"
                      + (f" + skip{len(skin)}本" if skin else "")

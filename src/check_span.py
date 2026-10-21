@@ -43,6 +43,9 @@ m_ne = re.search(r'N_EXT_LIST=\[([0-9,\s]*)\]', gtxt)
 next_ext = [int(x) for x in m_ne.group(1).split(',')] if m_ne else [0] * D
 m_dd = re.search(r'EXTDED=(\d+)', gtxt.splitlines()[0])   # ★2026-10-20 ia 専用 EXT（gen_cone_ext.py EXTDED）
 EXTDED = int(m_dd.group(1)) if m_dd else 0
+# ★2026-10-21 EXTSEL（gen_cone_ext.py）: 段 c で EXT を受けるのは // EXTCOLS に書いた列だけ（列 → EXT 45本 全部）
+m_xc = re.search(r'^// EXTCOLS (.*)$', gtxt, re.M)
+EXTCOLS = {int(a): [int(v) for v in b.split(',') if v] for a, b in (t.split(':') for t in m_xc.group(1).split(';'))} if m_xc else None
 OFF = {}; o_ = 0
 for h in range(D):
     OFF[h] = o_; o_ += widths[D - 1 - h]
@@ -97,6 +100,12 @@ if EXTDED:   # ★2026-10-20: PI ノードの列 mod EXTDED = その PI の線�
                 elif ex.get(pp['I_a']) is None or kk % EXTDED != ex[pp['I_a']]:
                     err.append(f"{o}: 列{kk} に EXT[{ex.get(pp['I_a'])}] は来ない")
     next_ext = [len(pis)] * D                         # 以下の枠の検算は使わない（全部通す）
+if EXTCOLS is not None:   # ★2026-10-21: PI を読むセルは EXT の列
+    for c in logic:
+        o = c['o']
+        if o in cbo and any(p in pis for p in c['srcs']):
+            hh, kk = pos(SL[o])
+            if D - 1 - hh >= 1 and kk not in EXTCOLS.get(D - 1 - hh, []): err.append(f"{o}: 行{hh} 列{kk} は EXT の列でない")
 pi_at = defaultdict(set)
 for c in logic:
     if c['o'] in cbo:

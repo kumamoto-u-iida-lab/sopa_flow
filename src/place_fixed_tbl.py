@@ -29,6 +29,9 @@ next_ext = [int(x) for x in m_ne.group(1).split(',')] if m_ne else [0] * D
 #   PI ノードは「列 mod N = line[p]」の列にだけ置ける。段ごとの枠（N_EXT_LIST）と入れ子の判定は使わない。
 m_dd = re.search(r'EXTDED=(\d+)', gtxt.splitlines()[0])
 EXTDED = int(m_dd.group(1)) if m_dd else 0
+# ★2026-10-21 EXTSEL（gen_cone_ext.py）: 段 c で EXT を受けるのは // EXTCOLS に書いた列だけ（列 → EXT 45本 全部）
+m_xc = re.search(r'^// EXTCOLS (.*)$', gtxt, re.M)
+EXTCOLS = {int(a): [int(v) for v in b.split(',') if v] for a, b in (t.split(':') for t in m_xc.group(1).split(';'))} if m_xc else None
 
 
 def pis_of(eblif):
@@ -201,6 +204,16 @@ if PRUNE:
 for col, cs in bycol.items():
     if len(cs) > 1:
         m.AddAllDifferent([row[o] for o in cs])
+if EXTCOLS is not None:                          # PI を読むセルは EXT の列だけ
+    _xc = 0
+    for c_ in logic:
+        o = c_['o']
+        if o in col_of and col_of[o] >= 1 and any(s_ in PI for s_ in c_['srcs']):
+            cols = EXTCOLS.get(col_of[o], [])
+            if not cols:
+                print(f"結果: INFEASIBLE(EXT の列が無い) {o} 段{col_of[o]}"); sys.exit()
+            m.AddLinearExpressionInDomain(row[o], cp_model.Domain.FromValues(cols)); _xc += 1
+    print(f"EXTCOLS: PI を読むセル {_xc} 個を EXT の列（計 {sum(len(v) for v in EXTCOLS.values())} 列）に限定", flush=True)
 
 # ★2026-09-02 符号化の変更（place_fixed_tbl.py）:
 #   旧: 辺1本につき「uが行r」×「sが候補行r'」の Bool を 幅×候補数 個作って OR で結ぶ

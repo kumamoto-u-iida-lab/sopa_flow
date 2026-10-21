@@ -78,6 +78,9 @@ m_ne = re.search(r'N_EXT_LIST=\[([0-9,\s]*)\]', gtxt)
 next_ext = [int(x) for x in m_ne.group(1).split(',')] if m_ne else [0] * D
 m_dd = re.search(r'EXTDED=(\d+)', gtxt.splitlines()[0])   # ★2026-10-20 ia 専用 EXT（gen_cone_ext.py EXTDED）
 EXTDED = int(m_dd.group(1)) if m_dd else 0
+# ★2026-10-21 EXTSEL（gen_cone_ext.py）: 段 c で EXT を受けるのは // EXTCOLS に書いた列だけ（列 → EXT 45本 全部）
+m_xc = re.search(r'^// EXTCOLS (.*)$', gtxt, re.M)
+EXTCOLS = {int(a): [int(v) for v in b.split(',') if v] for a, b in (t.split(':') for t in m_xc.group(1).split(';'))} if m_xc else None
 W = lambda h: widths[D - 1 - h]                     # 行h の列数
 OFF = {}; _o = 0
 for h in range(D):                                  # 通し番号 = OFF[行] + 列
@@ -134,11 +137,14 @@ for h in range(D - 1):
 m = cp_model.CpModel()
 x = {}                                               # x[o][(h,k)]
 cellat = defaultdict(list)                           # マス -> そこに置けるもの(Bool)
+_rdpi = {c_['o'] for c_ in logic if any(s_ in PI for s_ in c_['srcs'])}
+_okcol = lambda o, h, k: EXTCOLS is None or o not in _rdpi or D - 1 - h == 0 or k in EXTCOLS.get(D - 1 - h, [])
 for o in cbo:
-    x[o] = {(h, k): m.NewBoolVar('') for h in dom[o] for k in range(W(h))}
+    x[o] = {(h, k): m.NewBoolVar('') for h in dom[o] for k in range(W(h)) if _okcol(o, h, k)}   # ★EXTSEL: PI を読むセルは EXT の列だけ
+    if not x[o]: print(f"結果: INFEASIBLE(EXT の列が無い) {o}"); sys.exit()
     m.AddExactlyOne(x[o].values())
     for hk, b in x[o].items(): cellat[hk].append(b)
-inrow = lambda o, h: sum(x[o][(h, k)] for k in range(W(h))) if h in dom[o] else 0
+inrow = lambda o, h: sum(v for (hh, k), v in x[o].items() if hh == h) if h in dom[o] else 0   # ★EXTSEL で消えたマスは数えない
 
 ftrec = []                                           # (親, 中継のy辞書, 使うBool)
 viarec = []                                          # (親, 子, g, 中継のy辞書)

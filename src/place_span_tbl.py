@@ -115,6 +115,18 @@ else:
         v = h0[o] if o in fixed0 or not kids[o] else min(hm(k) + 2 for k in kids[o])
         hmax[o] = min(D - 1, v); return hmax[o]
     dom = {o: list(range(h0[o], hm(o) + 1)) for o in cbo}
+# ★2026-10-22 EXTDED（TOPEXT）構造の最上段（行 D-1）は PA の入力が EXT と定数1に固定 → 置けるのは PI ノード（I_a=PI, I_b=$true）だけ。
+#   それ以外のセルを最上段に上げると、親の候補表を調べないまま「載った」と誤判定するので、行の範囲から外す。
+if EXTDED:
+    _pin0 = set()
+    for l in open(EB):
+        if l.startswith('.subckt cell'):
+            pp = dict(t.split('=', 1) for t in l.split()[2:])
+            if pp.get('I_a') in PI and pp.get('I_b') == '$true': _pin0.add(pp['O_a'])
+    for o in cbo:
+        if o not in _pin0 and D - 1 in dom[o]:
+            dom[o] = [h for h in dom[o] if h != D - 1]
+            if not dom[o]: print(f"結果: INFEASIBLE(最上段に PI ノード以外) {o}"); sys.exit()
 # 親子で矛盾する行を前もって削る（子の行+1 以上 +2 以下に親が無い行は不要）
 changed = True
 while changed:

@@ -5,7 +5,10 @@
   列数の決まり（ff7 と同じ）: 行0（FF）= FF0 固定、他の行は ⌈包絡線 × SCALE⌉、
   FF 側から「入力側の行 ≤ 2 × FF 側の隣」、逆向きに「FF 側の行 ≥ 入力側の隣 / 2」。
   最上段も倍率をかける（EXTDED 構造では最上段も普通の行と同じく PI ノードの置き場なので）。
+ ★2026-10-22 TOTAL=<PA 数>: 合計がちょうど TOTAL になる倍率を二分探索で探す（端数は倍率を上げたとき先に増える行に +1）。
+   EXTRA=1: ネットリストの段数（NROW）の上に1段足す。足した行の列数は、その下の行と同じ（案B で PI ノードを上げる置き場）。
  使い方: EBDIR=data/eblif_pilocal NROW=19 SCALE=1.2 python3 envelope_widths.py
+         EBDIR=data/eblif_pilocal NROW=19 EXTRA=1 TOTAL=1536 python3 envelope_widths.py
          → 1行目に gen_cone_ext.py の引数（FF 側→入力側）、標準エラーに包絡線と合計
 """
 import os, sys, math
@@ -20,6 +23,8 @@ if not os.path.isabs(EBDIR): EBDIR = os.path.join(ROOT, EBDIR)
 NROW = int(os.environ.get("NROW", "19"))
 SCALE = float(os.environ.get("SCALE", "1.2"))
 FF0 = int(os.environ.get("FF0", "7"))
+TOTAL = int(os.environ.get("TOTAL", "0"))
+EXTRA = int(os.environ.get("EXTRA", "0"))
 
 E = [0] * NROW
 for c in sorted(os.listdir(EBDIR)):
@@ -32,9 +37,23 @@ for c in sorted(os.listdir(EBDIR)):
     u = [0] * NROW
     for v in row.values(): u[v] += 1
     E = [max(a, b) for a, b in zip(E, u)]
-w = [FF0] + [math.ceil(e * SCALE) for e in E[1:]]
-for h in range(1, NROW): w[h] = min(w[h], 2 * w[h - 1])
-for h in range(NROW - 2, 0, -1): w[h] = max(w[h], math.ceil(w[h + 1] / 2))
+def build(f):
+    w = [FF0] + [math.ceil(e * f) for e in E[1:]]
+    for h in range(1, NROW): w[h] = min(w[h], 2 * w[h - 1])
+    for h in range(NROW - 2, 0, -1): w[h] = max(w[h], math.ceil(w[h + 1] / 2))
+    return w + [w[-1]] * EXTRA                    # 足した行 = 下の行と同じ列数
+
+
+if TOTAL:
+    lo, hi = 0.5, 10.0
+    for _ in range(80):
+        m = (lo + hi) / 2
+        lo, hi = (m, hi) if sum(build(m)) <= TOTAL else (lo, m)
+    SCALE = lo; w = build(lo); nxt = build(hi)
+    for h in [h for h in range(1, NROW - 1) if nxt[h] > w[h]][:TOTAL - sum(w)]: w[h] += 1
+    assert sum(w) == TOTAL, (sum(w), TOTAL)
+else:
+    w = build(SCALE)
 assert all(max(a, b) <= 2 * min(a, b) for a, b in zip(w, w[1:]))
 print(','.join(map(str, w)))
-print(f"包絡線 {sum(E)} {E}\n×{SCALE} → {sum(w)} {w}", file=sys.stderr)
+print(f"包絡線 {sum(E)} {E}\n×{SCALE:.4f}{' +1段' if EXTRA else ''} → {sum(w)} {w}", file=sys.stderr)

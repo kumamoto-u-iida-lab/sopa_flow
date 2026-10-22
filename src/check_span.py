@@ -94,6 +94,8 @@ if EXTDED:   # ★2026-10-20: PI ノードの列 mod EXTDED = その PI の線�
             pp = dict(t.split('=', 1) for t in l.split()[2:]); o = pp['O_a']
             if o not in cbo: continue
             if pp.get('I_b') in pis: err.append(f"{o}: PI を ib で読む")
+            if pos(SL[o])[0] == D - 1 and not (pp.get('I_a') in pis and pp.get('I_b') == '$true'):
+                err.append(f"{o}: 最上段（EXT 直結）に PI ノード以外")   # ★2026-10-22
             if pp.get('I_a') in pis:
                 hh, kk = pos(SL[o])
                 if hh == 0 or pp.get('I_b') != '$true': err.append(f"{o}: PI ノードの形でない／FF の行")

@@ -70,3 +70,8 @@ cd area && JOBS=1 TARGETS="superset_pilocal_s120_alt_cyc" ./run_sopa_conf_new.sh
 ```bash
 cd area && JOBS=1 TARGETS="superset_r1536_xc_even_alt_cyc superset_r1536_xc_reach2_alt_cyc superset_r1536_xc_tail_alt_cyc superset_r1536_xc_head_alt_cyc" ./run_sopa_conf_new.sh |& tee run_xc_area.log
 ```
+
+## 2026-10-22 追加: pilocal を PA 数 1,152/1,536/1,920/2,304/3,072 で（superset_pilocal_pa<N>_alt_cyc）
+```bash
+cd area && JOBS=1 TARGETS="superset_pilocal_pa1152_alt_cyc superset_pilocal_pa1536_alt_cyc superset_pilocal_pa1920_alt_cyc superset_pilocal_pa2304_alt_cyc superset_pilocal_pa3072_alt_cyc" ./run_sopa_conf_new.sh |& tee run_pilocal_sweep_area.log
+```
